@@ -15,7 +15,7 @@ const socials = [
   { icon: Instagram, href: "https://www.instagram.com/jqnllyd",                       label: "Instagram" },
 ];
 
-const roles = ["Full-Stack Developer", "QA Engineer", "Mobile Developer", "Laravel Developer"];
+const ROLES = ["Full-Stack Developer", "QA Engineer", "Mobile Developer", "Laravel Developer"];
 const CV = "/images/CV/CV Resume.png";
 
 const up = (d = 0) => ({
@@ -24,7 +24,21 @@ const up = (d = 0) => ({
 });
 
 export default function HeroSection() {
-  const [cvOpen, setCvOpen] = useState(false);
+  const [cvOpen,    setCvOpen]    = useState(false);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [roleVisible, setRoleVisible] = useState(true);
+
+  // Cycle roles: fade out → swap text → fade in
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRoleVisible(false);
+      setTimeout(() => {
+        setRoleIndex(i => (i + 1) % ROLES.length);
+        setRoleVisible(true);
+      }, 350);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setCvOpen(false); };
@@ -144,18 +158,16 @@ export default function HeroSection() {
               <motion.div variants={up(0.22)} initial="hidden" animate="show"
                 className="flex items-center gap-2 mb-8 justify-center lg:justify-start">
                 <span className="text-xs font-inter" style={{ color: "#64748b" }}>Currently:</span>
-                <div className="overflow-hidden h-5">
-                  <motion.div
-                    animate={{ y: roles.map((_, i) => `-${i * 100}%`) }}
-                    transition={{ duration: 0.4, repeat: Infinity, repeatDelay: 2.8, ease: "easeInOut" }}
-                  >
-                    {roles.map(r => (
-                      <div key={r} className="h-5 flex items-center">
-                        <span className="text-xs font-mono-code" style={{ color: "#0ea5e9" }}>{r}</span>
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
+                <motion.span
+                  key={roleIndex}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: roleVisible ? 1 : 0, y: roleVisible ? 0 : -6 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="text-xs font-mono-code"
+                  style={{ color: "#0ea5e9" }}
+                >
+                  {ROLES[roleIndex]}
+                </motion.span>
               </motion.div>
 
               {/* CTAs */}

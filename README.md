@@ -3,7 +3,7 @@
 # ✦ JHON LLOYD SAMSON ✦
 ### Software Developer & QA Engineer
 
-[![Portfolio](https://img.shields.io/badge/🌐_Live_Portfolio-000000?style=for-the-badge&logoColor=white)](https://jayel.vercel.app)
+[![Portfolio](https://img.shields.io/badge/🌐_Live_Portfolio-000000?style=for-the-badge&logoColor=white)](https://jhnllydsmsn.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Jhnllyd11-181717?style=for-the-badge&logo=github)](https://github.com/Jhnllyd11)
 
 ![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=flat-square&logo=nextdotjs&logoColor=white)
