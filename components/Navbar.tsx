@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { clsx } from "clsx";
-import { FileText, X, Menu } from "lucide-react";
+import { FileText, Menu, X } from "lucide-react";
 
-const links = [
+const NAV = [
   { label: "About",    href: "#about" },
   { label: "Stack",    href: "#stack" },
   { label: "Skills",   href: "#skills" },
@@ -15,146 +14,139 @@ const links = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled]   = useState(false);
-  const [open, setOpen]           = useState(false);
-  const [active, setActive]       = useState("");
+  const [scrolled, setScrolled] = useState(false);
+  const [open,     setOpen]     = useState(false);
+  const [active,   setActive]   = useState("");
 
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 40);
-      // Active section detection
-      const sections = links.map((l) => l.href.slice(1));
-      for (const id of [...sections].reverse()) {
-        const el = document.getElementById(id);
-        if (el && window.scrollY >= el.offsetTop - 120) {
-          setActive(id);
-          break;
-        }
+    const fn = () => {
+      setScrolled(window.scrollY > 50);
+      for (const { href } of [...NAV].reverse()) {
+        const el = document.getElementById(href.slice(1));
+        if (el && window.scrollY >= el.offsetTop - 140) { setActive(href.slice(1)); break; }
       }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
   return (
     <>
-      {/* Scroll progress bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left"
-        style={{
-          scaleX,
-          background: "linear-gradient(90deg, #0ea5e9, #22c55e)",
-        }}
-      />
+      {/* Scroll progress bar — single instance */}
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 2, zIndex: 60, pointerEvents: "none" }}>
+        <motion.div
+          style={{
+            height: "100%",
+            scaleX,
+            transformOrigin: "left",
+            background: "linear-gradient(90deg, #0ea5e9, #22c55e)",
+          }}
+        />
+      </div>
 
       <motion.header
-        initial={{ y: -80, opacity: 0 }}
+        initial={{ y: -70, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-        className={clsx(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled ? "glass border-b border-white/5 py-3" : "py-5"
-        )}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
+          background: scrolled ? "rgba(2,4,8,0.88)" : "transparent",
+          backdropFilter: scrolled ? "blur(24px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "none",
+          padding: scrolled ? "0.7rem 0" : "1.2rem 0",
+          transition: "background 0.35s, padding 0.35s, border-color 0.35s",
+        }}
       >
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group">
-            <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono-code font-bold text-obsidian"
-              style={{ background: "linear-gradient(135deg, #0ea5e9, #22c55e)" }}>
+          <a href="#" className="flex items-center gap-2.5">
+            <span
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-mono-code font-bold"
+              style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#020408" }}
+            >
               JL
             </span>
-            <span className="font-grotesk font-bold text-base gradient-text-nautical tracking-wider">
-              JayEL
-            </span>
+            <span className="font-grotesk font-bold text-base gradient-text-nautical tracking-wide">JayEL</span>
           </a>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {links.map((l) => {
-              const isActive = active === l.href.slice(1);
+          <nav className="hidden md:flex items-center gap-0.5">
+            {NAV.map(({ label, href }) => {
+              const isActive = active === href.slice(1);
               return (
                 <a
-                  key={l.href}
-                  href={l.href}
-                  className={clsx(
-                    "relative px-4 py-2 text-xs font-inter tracking-wide rounded-full transition-all duration-200",
-                    isActive ? "text-offwhite" : "text-muted hover:text-offwhite"
-                  )}
+                  key={href} href={href}
+                  className="relative px-4 py-2 text-xs font-inter rounded-full transition-all duration-200"
+                  style={{ color: isActive ? "#f1f5f9" : "#64748b" }}
+                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#f1f5f9"; }}
+                  onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#64748b"; }}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="nav-pill"
                       className="absolute inset-0 rounded-full"
-                      style={{ background: "rgba(14,165,233,0.12)", border: "1px solid rgba(14,165,233,0.25)" }}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      style={{ background: "rgba(14,165,233,0.1)", border: "1px solid rgba(14,165,233,0.2)" }}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
-                  <span className="relative z-10">{l.label}</span>
+                  <span className="relative z-10">{label}</span>
                 </a>
               );
             })}
           </nav>
 
-          {/* Resume CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Resume CTA + mobile toggle */}
+          <div className="flex items-center gap-3">
             <a
-              href="/images/CV/CV Resume.png"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-grotesk font-semibold transition-all duration-200 hover:shadow-[0_0_20px_rgba(14,165,233,0.3)]"
-              style={{ background: "linear-gradient(135deg, #0ea5e9, #22c55e)", color: "#0a0a0a" }}
+              href="/images/CV/CV Resume.png" target="_blank" rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-grotesk font-semibold transition-all duration-200"
+              style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#020408" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(14,165,233,0.4)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
             >
-              <FileText size={12} />
-              Resume
+              <FileText size={11} /> Resume
             </a>
+            <button
+              className="md:hidden w-9 h-9 glass rounded-full flex items-center justify-center"
+              style={{ color: "#64748b" }}
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <X size={15} /> : <Menu size={15} />}
+            </button>
           </div>
-
-          {/* Mobile toggle */}
-          <button
-            className="md:hidden w-9 h-9 glass rounded-full flex items-center justify-center text-muted hover:text-offwhite transition-colors"
-            onClick={() => setOpen(!open)}
-            aria-label="Menu"
-          >
-            {open ? <X size={15} /> : <Menu size={15} />}
-          </button>
         </div>
 
         {/* Mobile menu */}
         {open && (
-          <motion.nav
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="md:hidden glass border-t border-white/5 px-6 py-5 flex flex-col gap-1"
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+            className="md:hidden px-6 py-4 flex flex-col gap-1"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: "rgba(2,4,8,0.96)" }}
           >
-            {links.map((l) => (
+            {NAV.map(({ label, href }) => (
               <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className={clsx(
-                  "px-4 py-2.5 rounded-xl text-sm font-inter transition-all",
-                  active === l.href.slice(1)
-                    ? "text-maritime bg-maritime/10"
-                    : "text-muted hover:text-offwhite hover:bg-white/5"
-                )}
+                key={href} href={href} onClick={() => setOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-inter transition-all"
+                style={{
+                  color: active === href.slice(1) ? "#0ea5e9" : "#64748b",
+                  background: active === href.slice(1) ? "rgba(14,165,233,0.08)" : "transparent",
+                }}
               >
-                {l.label}
+                {label}
               </a>
             ))}
             <a
-              href="/images/CV/CV Resume.png"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-grotesk font-semibold text-obsidian"
-              style={{ background: "linear-gradient(135deg, #0ea5e9, #22c55e)" }}
+              href="/images/CV/CV Resume.png" target="_blank" rel="noopener noreferrer"
+              className="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-grotesk font-semibold"
+              style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#020408" }}
             >
               <FileText size={13} /> Resume
             </a>
-          </motion.nav>
+          </motion.div>
         )}
       </motion.header>
     </>

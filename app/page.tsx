@@ -24,24 +24,24 @@ export default function Home() {
     setMounted(true);
     import("lenis").then(({ default: Lenis }) => {
       const lenis = new Lenis({ lerp: 0.08, smoothWheel: true } as ConstructorParameters<typeof Lenis>[0]);
-      const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
+      const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
       requestAnimationFrame(raf);
     });
   }, []);
 
   if (!mounted) return null;
-  if (loading) return <Loader onComplete={() => setLoading(false)} />;
+  if (loading)  return <Loader onComplete={() => setLoading(false)} />;
 
   return (
-    <main className="relative bg-obsidian overflow-hidden">
-      {/* Fixed animated scroll-reactive background — sits behind everything */}
+    <>
+      {/* z-0: fixed 3D animated background canvas */}
       <ScrollBackground />
-
+      {/* z-9999: custom cursor */}
       <CustomCursor />
+      {/* z-50: navbar */}
       <Navbar />
-
-      {/* All sections sit above the background canvas */}
-      <div className="relative z-10">
+      {/* z-10: all page sections */}
+      <main style={{ position: "relative", zIndex: 10 }}>
         <HeroSection />
         <AboutSection />
         <TechStack />
@@ -50,7 +50,7 @@ export default function Home() {
         <CertsSection />
         <ContactSection />
         <Footer />
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

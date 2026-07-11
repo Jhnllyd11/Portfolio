@@ -2,174 +2,282 @@
 
 import { useEffect, useRef } from "react";
 
-interface Orb {
-  x: number;       // 0–1 normalized
-  y: number;       // 0–1 normalized
-  baseX: number;
-  baseY: number;
-  r: number;
-  color: [number, number, number];
-  speed: number;
-  phase: number;
+/* ── math helpers ─────────────────────────────────────────────────────────── */
+function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
+function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
+
+/* ── 3-D projection ───────────────────────────────────────────────────────── */
+function project(
+  x: number, y: number, z: number,
+  cx: number, cy: number,
+  fov: number
+): [number, number, number] {
+  const scale = fov / (fov + z);
+  return [cx + x * scale, cy + y * scale, scale];
 }
 
-// Section color palettes — interpolated as user scrolls
-const SECTION_PALETTES = [
-  // Hero
-  { orbs: [[14, 165, 233], [34, 197, 94]] as [number,number,number][], grid: "rgba(14,165,233,0.04)" },
-  // About
-  { orbs: [[14, 165, 233], [189, 0, 255]] as [number,number,number][], grid: "rgba(14,165,233,0.035)" },
-  // Stack
-  { orbs: [[34, 197, 94], [14, 165, 233]] as [number,number,number][], grid: "rgba(34,197,94,0.04)" },
-  // Skills
-  { orbs: [[0, 243, 255], [34, 197, 94]] as [number,number,number][], grid: "rgba(0,243,255,0.035)" },
-  // Projects
-  { orbs: [[14, 165, 233], [0, 243, 255]] as [number,number,number][], grid: "rgba(14,165,233,0.04)" },
-  // Certs
-  { orbs: [[34, 197, 94], [189, 0, 255]] as [number,number,number][], grid: "rgba(34,197,94,0.035)" },
-  // Contact
-  { orbs: [[14, 165, 233], [34, 197, 94]] as [number,number,number][], grid: "rgba(14,165,233,0.04)" },
+/* ── icosahedron vertices ─────────────────────────────────────────────────── */
+function buildIcosahedron(r: number): [number, number, number][] {
+  const t = (1 + Math.sqrt(5)) / 2;
+  const raw: [number, number, number][] = [
+    [-1, t, 0],[1, t, 0],[-1,-t, 0],[1,-t, 0],
+    [0,-1, t],[0, 1, t],[0,-1,-t],[0, 1,-t],
+    [t, 0,-1],[t, 0, 1],[-t, 0,-1],[-t, 0, 1],
+  ];
+  return raw.map(([x, y, z]) => {
+    const len = Math.sqrt(x*x + y*y + z*z);
+    return [x/len*r, y/len*r, z/len*r];
+  });
+}
+
+const ICO_EDGES = [
+  [0,1],[0,5],[0,7],[0,10],[0,11],
+  [1,5],[1,7],[1,8],[1,9],
+  [2,3],[2,6],[2,10],[2,11],[2,4],
+  [3,4],[3,6],[3,8],[3,9],
+  [4,5],[4,9],[4,11],
+  [5,9],[5,11],
+  [6,7],[6,8],[6,10],
+  [7,8],[7,10],
+  [8,9],[10,11],
 ];
 
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
-function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)); }
+/* ── section color palettes ───────────────────────────────────────────────── */
+const PALETTES = [
+  { a: [14,165,233] as [number,number,number], b: [34,197,94]  as [number,number,number] }, // Hero
+  { a: [99,102,241] as [number,number,number], b: [14,165,233] as [number,number,number] }, // About
+  { a: [34,197,94]  as [number,number,number], b: [0,243,255]  as [number,number,number] }, // Stack
+  { a: [0,243,255]  as [number,number,number], b: [34,197,94]  as [number,number,number] }, // Skills
+  { a: [14,165,233] as [number,number,number], b: [189,0,255]  as [number,number,number] }, // Projects
+  { a: [34,197,94]  as [number,number,number], b: [14,165,233] as [number,number,number] }, // Certs
+  { a: [14,165,233] as [number,number,number], b: [34,197,94]  as [number,number,number] }, // Contact
+];
+
+interface Particle {
+  x: number; y: number; z: number;
+  vx: number; vy: number;
+  size: number; opacity: number;
+}
 
 export default function ScrollBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scrollRef = useRef(0);
-  const targetScrollRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  const timeRef = useRef(0);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const canvas = canvasRef.current!;
+    const ctx    = canvas.getContext("2d")!;
+    let W = 0, H = 0, raf = 0;
+    let scrollY = 0, targetScrollY = 0;
+    let curA: [number,number,number] = [14,165,233];
+    let curB: [number,number,number] = [34,197,94];
+    let tarA: [number,number,number] = [14,165,233];
+    let tarB: [number,number,number] = [34,197,94];
 
-    let W = 0, H = 0;
-
-    const resize = () => {
-      W = canvas.width  = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    };
+    const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("scroll", () => { targetScrollY = window.scrollY; }, { passive: true });
 
-    // Orbs — positioned at key spots
-    const orbs: Orb[] = [
-      { x: 0.15, y: 0.25, baseX: 0.15, baseY: 0.25, r: 0.38, color: [14, 165, 233],  speed: 0.0004, phase: 0 },
-      { x: 0.82, y: 0.65, baseX: 0.82, baseY: 0.65, r: 0.32, color: [34, 197, 94],   speed: 0.0003, phase: 1.5 },
-      { x: 0.5,  y: 0.5,  baseX: 0.5,  baseY: 0.5,  r: 0.22, color: [0, 243, 255],   speed: 0.0005, phase: 3.0 },
-      { x: 0.9,  y: 0.1,  baseX: 0.9,  baseY: 0.1,  r: 0.18, color: [189, 0, 255],   speed: 0.0006, phase: 4.5 },
-    ];
+    /* particles */
+    const PCOUNT = 80;
+    const particles: Particle[] = Array.from({ length: PCOUNT }, () => ({
+      x: Math.random() * 2000 - 1000,
+      y: Math.random() * 2000 - 1000,
+      z: Math.random() * 800 - 400,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      size: Math.random() * 2 + 0.5,
+      opacity: Math.random() * 0.6 + 0.2,
+    }));
 
-    const onScroll = () => { targetScrollRef.current = window.scrollY; };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    /* icosahedron */
+    const icoVerts = buildIcosahedron(220);
+    let rotX = 0, rotY = 0, rotZ = 0;
 
-    const draw = (timestamp: number) => {
-      timeRef.current = timestamp;
+    function rotateVert(v: [number,number,number], rx: number, ry: number, rz: number): [number,number,number] {
+      let [x, y, z] = v;
+      // rotate X
+      let y2 = y * Math.cos(rx) - z * Math.sin(rx);
+      let z2 = y * Math.sin(rx) + z * Math.cos(rx);
+      y = y2; z = z2;
+      // rotate Y
+      let x2 = x * Math.cos(ry) + z * Math.sin(ry);
+      let z3 = -x * Math.sin(ry) + z * Math.cos(ry);
+      x = x2; z = z3;
+      // rotate Z
+      let x3 = x * Math.cos(rz) - y * Math.sin(rz);
+      let y3 = x * Math.sin(rz) + y * Math.cos(rz);
+      return [x3, y3, z];
+    }
 
-      // Smooth scroll lerp
-      scrollRef.current = lerp(scrollRef.current, targetScrollRef.current, 0.06);
-      const scrollY = scrollRef.current;
+    function draw(ts: number) {
+      /* smooth scroll */
+      scrollY = lerp(scrollY, targetScrollY, 0.05);
 
-      // Determine which palette to use based on scroll
+      /* palette interpolation */
       const docH = Math.max(document.body.scrollHeight - window.innerHeight, 1);
-      const progress = clamp(scrollY / docH, 0, 1); // 0–1 across full page
-      const palIdx = progress * (SECTION_PALETTES.length - 1);
-      const palA = SECTION_PALETTES[Math.floor(palIdx)];
-      const palB = SECTION_PALETTES[Math.min(Math.ceil(palIdx), SECTION_PALETTES.length - 1)];
-      const palT = palIdx % 1;
+      const prog = clamp(scrollY / docH, 0, 1);
+      const pi   = prog * (PALETTES.length - 1);
+      const pf   = Math.floor(pi), pc = Math.min(pf + 1, PALETTES.length - 1);
+      const pt   = pi - pf;
+      tarA = PALETTES[pf].a.map((v, i) => lerp(v, PALETTES[pc].a[i], pt)) as [number,number,number];
+      tarB = PALETTES[pf].b.map((v, i) => lerp(v, PALETTES[pc].b[i], pt)) as [number,number,number];
+      curA = curA.map((v, i) => lerp(v, tarA[i], 0.025)) as [number,number,number];
+      curB = curB.map((v, i) => lerp(v, tarB[i], 0.025)) as [number,number,number];
 
-      // Interpolate orb colors
-      const c0: [number,number,number] = [
-        lerp(palA.orbs[0][0], palB.orbs[0][0], palT),
-        lerp(palA.orbs[0][1], palB.orbs[0][1], palT),
-        lerp(palA.orbs[0][2], palB.orbs[0][2], palT),
-      ];
-      const c1: [number,number,number] = [
-        lerp(palA.orbs[1][0], palB.orbs[1][0], palT),
-        lerp(palA.orbs[1][1], palB.orbs[1][1], palT),
-        lerp(palA.orbs[1][2], palB.orbs[1][2], palT),
-      ];
-      orbs[0].color = c0;
-      orbs[1].color = c1;
+      const [ar,ag,ab] = curA.map(Math.round);
+      const [br,bg,bb] = curB.map(Math.round);
 
       ctx.clearRect(0, 0, W, H);
 
-      // ── Animated orbs ──────────────────────────────────────────────────────
-      for (const orb of orbs) {
-        const t = timestamp * orb.speed + orb.phase;
-        // Float around base position
-        const ox = (orb.baseX + Math.sin(t) * 0.08) * W;
-        const oy = (orb.baseY + Math.cos(t * 0.7) * 0.06) * H;
-        // Scroll parallax — each orb moves at different rate
-        const parallax = scrollY * (0.08 + orb.phase * 0.015);
-        const fy = oy - parallax;
+      /* ── deep background ── */
+      const bgGrd = ctx.createLinearGradient(0, 0, W, H);
+      bgGrd.addColorStop(0, "#020408");
+      bgGrd.addColorStop(0.5, "#050d1a");
+      bgGrd.addColorStop(1, "#020408");
+      ctx.fillStyle = bgGrd;
+      ctx.fillRect(0, 0, W, H);
 
-        const radius = orb.r * Math.min(W, H);
-        const grd = ctx.createRadialGradient(ox, fy, 0, ox, fy, radius);
-        const [r, g, b] = orb.color;
-        grd.addColorStop(0,   `rgba(${r},${g},${b},0.12)`);
-        grd.addColorStop(0.4, `rgba(${r},${g},${b},0.05)`);
-        grd.addColorStop(1,   `rgba(${r},${g},${b},0)`);
-        ctx.fillStyle = grd;
+      /* ── aurora wave layers ── */
+      const t = ts * 0.0004;
+      const scrollShift = scrollY * 0.12;
+
+      for (let layer = 0; layer < 3; layer++) {
+        const phase  = layer * 1.2 + t;
+        const yBase  = H * (0.25 + layer * 0.22) - scrollShift * (1 + layer * 0.3);
+        const amp    = 90 + layer * 30;
+        const alpha  = 0.07 - layer * 0.015;
+        const color  = layer % 2 === 0
+          ? `rgba(${ar},${ag},${ab},${alpha})`
+          : `rgba(${br},${bg},${bb},${alpha})`;
+
+        ctx.beginPath();
+        ctx.moveTo(0, H);
+        for (let x = 0; x <= W; x += 4) {
+          const y = yBase
+            + Math.sin(x * 0.006 + phase) * amp
+            + Math.sin(x * 0.003 + phase * 0.7) * amp * 0.5
+            + Math.cos(x * 0.009 + phase * 1.3) * amp * 0.3;
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W, H);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      /* ── aurora glow blobs ── */
+      for (let i = 0; i < 3; i++) {
+        const blobX = W * (0.2 + i * 0.3) + Math.sin(t * 0.8 + i) * W * 0.08;
+        const blobY = H * (0.3 + i * 0.15) - scrollShift * (0.5 + i * 0.2);
+        const blobR = Math.min(W, H) * (0.35 + i * 0.05);
+        const blobG = ctx.createRadialGradient(blobX, blobY, 0, blobX, blobY, blobR);
+        const bc = i % 2 === 0 ? [ar,ag,ab] : [br,bg,bb];
+        blobG.addColorStop(0,   `rgba(${bc[0]},${bc[1]},${bc[2]},0.12)`);
+        blobG.addColorStop(0.4, `rgba(${bc[0]},${bc[1]},${bc[2]},0.05)`);
+        blobG.addColorStop(1,   `rgba(${bc[0]},${bc[1]},${bc[2]},0)`);
+        ctx.fillStyle = blobG;
         ctx.fillRect(0, 0, W, H);
       }
 
-      // ── Scroll-reactive grid ───────────────────────────────────────────────
-      const gridSize = 80;
-      // Grid shifts slightly with scroll for parallax feel
-      const gridOffsetY = (scrollY * 0.15) % gridSize;
-      const gridOpacity = 0.03 + Math.sin(timestamp * 0.0003) * 0.01;
+      /* ── 3D icosahedron wireframe ── */
+      rotX = ts * 0.00018 + scrollY * 0.0003;
+      rotY = ts * 0.00025 + scrollY * 0.0002;
+      rotZ = ts * 0.00012;
 
-      ctx.strokeStyle = `rgba(14,165,233,${gridOpacity})`;
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += gridSize) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
+      const cx = W * 0.78, cy = H * 0.42 - scrollShift * 0.15;
+      const fov = 500;
+
+      const projected = icoVerts.map(v => {
+        const rv = rotateVert(v, rotX, rotY, rotZ);
+        return project(rv[0], rv[1], rv[2], cx, cy, fov);
+      });
+
+      ctx.lineWidth = 0.8;
+      for (const [i, j] of ICO_EDGES) {
+        const [x1, y1, s1] = projected[i];
+        const [x2, y2, s2] = projected[j];
+        const depth = (s1 + s2) / 2;
+        const alpha = clamp(depth * 0.35, 0.04, 0.28);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = `rgba(${ar},${ag},${ab},${alpha})`;
+        ctx.stroke();
       }
-      for (let y = -gridSize + gridOffsetY; y <= H; y += gridSize) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
+
+      /* vertex dots */
+      for (const [px, py, sc] of projected) {
+        const alpha = clamp(sc * 0.5, 0.05, 0.5);
+        ctx.beginPath();
+        ctx.arc(px, py, sc * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${ar},${ag},${ab},${alpha})`;
+        ctx.fill();
       }
-      ctx.stroke();
 
-      // ── Diagonal scan line ─────────────────────────────────────────────────
-      const scanY = ((timestamp * 0.04 + scrollY * 0.05) % (H + 200)) - 100;
-      const scanGrd = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60);
-      scanGrd.addColorStop(0,   "rgba(14,165,233,0)");
-      scanGrd.addColorStop(0.5, "rgba(14,165,233,0.025)");
-      scanGrd.addColorStop(1,   "rgba(14,165,233,0)");
-      ctx.fillStyle = scanGrd;
-      ctx.fillRect(0, scanY - 60, W, 120);
+      /* ── floating particles with depth ── */
+      const pcx = W / 2, pcy = H / 2;
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x > 1000) p.x = -1000;
+        if (p.x < -1000) p.x = 1000;
+        if (p.y > 1000) p.y = -1000;
+        if (p.y < -1000) p.y = 1000;
 
-      // ── Vignette ──────────────────────────────────────────────────────────
-      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, H * 0.85);
-      vig.addColorStop(0, "rgba(10,10,10,0)");
-      vig.addColorStop(1, "rgba(10,10,10,0.55)");
+        const [sx, sy, sc] = project(p.x, p.y - scrollShift * 0.3, p.z, pcx, pcy, 600);
+        if (sc <= 0) continue;
+        const alpha = clamp(p.opacity * sc, 0.03, 0.5);
+        const r2 = p.size * sc;
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, r2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${ar},${ag},${ab},${alpha})`;
+        ctx.fill();
+      }
+
+      /* ── dot grid with parallax ── */
+      const GRID = 64;
+      const gox = 0;
+      const goy = (scrollY * 0.18) % GRID;
+      ctx.fillStyle = `rgba(${ar},${ag},${ab},0.12)`;
+      for (let x = gox % GRID; x < W; x += GRID) {
+        for (let y = goy % GRID - GRID; y < H + GRID; y += GRID) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      /* ── scan line ── */
+      const sy2 = ((ts * 0.05 + scrollY * 0.06) % (H + 200)) - 100;
+      const sg = ctx.createLinearGradient(0, sy2 - 60, 0, sy2 + 60);
+      sg.addColorStop(0,    `rgba(${ar},${ag},${ab},0)`);
+      sg.addColorStop(0.5,  `rgba(${ar},${ag},${ab},0.06)`);
+      sg.addColorStop(1,    `rgba(${ar},${ag},${ab},0)`);
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, sy2 - 60, W, 120);
+
+      /* ── vignette ── */
+      const vig = ctx.createRadialGradient(W/2, H/2, H*0.1, W/2, H/2, H*0.85);
+      vig.addColorStop(0, "rgba(2,4,8,0)");
+      vig.addColorStop(1, "rgba(2,4,8,0.7)");
       ctx.fillStyle = vig;
       ctx.fillRect(0, 0, W, H);
 
-      rafRef.current = requestAnimationFrame(draw);
-    };
+      raf = requestAnimationFrame(draw);
+    }
 
-    rafRef.current = requestAnimationFrame(draw);
-
+    raf = requestAnimationFrame(draw);
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
+      style={{ position: "fixed", inset: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}
     />
   );
 }
