@@ -5,45 +5,22 @@ import { motion, useInView } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { Send, CheckCircle, AlertCircle, Loader2, Github, Linkedin, Mail } from "lucide-react";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// EmailJS Configuration
-// ─────────────────────────────────────────────────────────────────────────────
-// 1. Go to https://www.emailjs.com/ and create a free account.
-// 2. Add an Email Service (Gmail, Outlook, etc.) → copy the Service ID below.
-// 3. Create an Email Template with variables: {{from_name}}, {{reply_to}},
-//    {{subject}}, {{message}} → copy the Template ID below.
-// 4. Go to Account → API Keys → copy your Public Key below.
-// 5. Replace the three placeholder strings with your real credentials.
-// ─────────────────────────────────────────────────────────────────────────────
 const EMAILJS_SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID  ?? "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "YOUR_TEMPLATE_ID";
 const EMAILJS_PUBLIC_KEY  = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY  ?? "YOUR_PUBLIC_KEY";
 
 type Status = "idle" | "sending" | "success" | "error";
 
-/** Sends the form via EmailJS. Returns true on success, throws on failure. */
-async function sendEmail(form: HTMLFormElement): Promise<void> {
-  await emailjs.sendForm(
-    EMAILJS_SERVICE_ID,
-    EMAILJS_TEMPLATE_ID,
-    form,
-    EMAILJS_PUBLIC_KEY
-  );
-}
-
-const fadeUp = (delay = 0) => ({
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: "easeOut" } },
-});
-
-const inputClass =
-  "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-inter text-offwhite placeholder-muted focus:outline-none focus:border-maritime/60 focus:bg-white/8 transition-all duration-200";
-
 const contacts = [
-  { icon: Mail,     label: "Jhonlloydsamson11@gmail.com", href: "mailto:Jhonlloydsamson11@gmail.com" },
-  { icon: Github,   label: "github.com/Jhnllyd11",        href: "https://github.com/Jhnllyd11" },
-  { icon: Linkedin, label: "linkedin.com/in/jhonlloyd-samson", href: "https://www.linkedin.com/in/jhonlloyd-samson-ba94b9411/" },
+  { icon: Mail,     label: "Jhonlloydsamson11@gmail.com", href: "mailto:Jhonlloydsamson11@gmail.com", color: "#CE9178" },
+  { icon: Github,   label: "github.com/Jhnllyd11",        href: "https://github.com/Jhnllyd11",       color: "#D4D4D4" },
+  { icon: Linkedin, label: "linkedin.com/in/jhonlloyd-samson", href: "https://www.linkedin.com/in/jhonlloyd-samson-ba94b9411/", color: "#569CD6" },
 ];
+
+const fadeUp = (d = 0) => ({
+  hidden: { opacity: 0, y: 32 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, delay: d, ease: [0.22, 1, 0.36, 1] as number[] } },
+});
 
 export default function ContactSection() {
   const ref = useRef(null);
@@ -56,10 +33,9 @@ export default function ContactSection() {
     if (!formRef.current || status === "sending") return;
     setStatus("sending");
     try {
-      await sendEmail(formRef.current);
+      await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current, EMAILJS_PUBLIC_KEY);
       setStatus("success");
       formRef.current.reset();
-      // Auto-reset after 5 s so user can send again
       setTimeout(() => setStatus("idle"), 5000);
     } catch {
       setStatus("error");
@@ -68,169 +44,144 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" ref={ref} className="section-padding max-w-5xl mx-auto">
-      {/* Header */}
-      <motion.p
-        variants={fadeUp(0)} initial="hidden" animate={inView ? "show" : "hidden"}
-        className="text-maritime text-xs tracking-[0.3em] uppercase font-inter mb-2"
-      >
-        Get In Touch
-      </motion.p>
-      <motion.h2
-        variants={fadeUp(0.1)} initial="hidden" animate={inView ? "show" : "hidden"}
-        className="font-grotesk font-bold text-4xl md:text-5xl mb-4"
-      >
-        Let&apos;s <span className="gradient-text-nautical">Connect</span>
+    <section id="contact" ref={ref} className="section-wrap">
+      <p className="section-label">Get In Touch</p>
+      <motion.h2 variants={fadeUp(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
+        <span style={{ color: "#DCDCAA" }}>contact</span>
+        <span style={{ color: "#808080" }}>.</span>
+        <span style={{ color: "#4EC9B0" }}>send</span>
+        <span style={{ color: "#808080" }}>(</span>
+        <span style={{ color: "#9CDCFE" }}>message</span>
+        <span style={{ color: "#808080" }}>)</span>
       </motion.h2>
-      <motion.p
-        variants={fadeUp(0.2)} initial="hidden" animate={inView ? "show" : "hidden"}
-        className="text-muted font-inter text-sm mb-12 max-w-xl"
-      >
+
+      <motion.p variants={fadeUp(0.1)} initial="hidden" animate={inView ? "show" : "hidden"}
+        style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#858585", marginBottom: 32, maxWidth: 480 }}>
         Open to opportunities in QA Engineering, Full-Stack Web Development, or Mobile Development.
-        Drop a message and I&apos;ll get back to you within 24 hours.
+        I&apos;ll get back to you within 24 hours.
       </motion.p>
 
-      <div className="grid md:grid-cols-5 gap-8">
-        {/* Contact info sidebar */}
-        <motion.div
-          variants={fadeUp(0.25)} initial="hidden" animate={inView ? "show" : "hidden"}
-          className="md:col-span-2 space-y-4"
-        >
-          {contacts.map(({ icon: Icon, label, href }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 glass glass-hover rounded-xl p-4 group transition-all"
+      <div className="grid md:grid-cols-5 gap-6">
+        {/* Sidebar */}
+        <motion.div variants={fadeUp(0.15)} initial="hidden" animate={inView ? "show" : "hidden"}
+          className="md:col-span-2" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+          {contacts.map(({ icon: Icon, label, href, color }) => (
+            <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+              className="ide-window glass-hover"
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", textDecoration: "none", transition: "border-color 0.2s" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${color}40`; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
             >
-              <div className="w-9 h-9 rounded-lg bg-maritime/10 border border-maritime/20 flex items-center justify-center shrink-0 group-hover:bg-maritime/20 transition-colors">
-                <Icon size={15} className="text-maritime" />
+              <div style={{
+                width: 32, height: 32, borderRadius: 4, flexShrink: 0,
+                background: `${color}12`, border: `1px solid ${color}25`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Icon size={13} style={{ color }} />
               </div>
-              <span className="text-muted text-xs font-inter group-hover:text-maritime transition-colors break-all">
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#858585", wordBreak: "break-all" }}>
                 {label}
               </span>
             </a>
           ))}
 
-          {/* Availability badge */}
-          <div className="glass rounded-xl p-4 flex items-center gap-3">
+          {/* Availability */}
+          <div className="ide-window" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
             <span className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cypress opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cypress" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full" style={{ background: "#22C55E", opacity: 0.75 }} />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: "#22C55E" }} />
             </span>
-            <span className="text-xs font-inter text-muted">
-              Available for <span className="text-cypress">new opportunities</span>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#6A9955" }}>
+              {"// available for new opportunities"}
             </span>
           </div>
         </motion.div>
 
-        {/* Form — slides in from bottom */}
-        <motion.div
-          variants={fadeUp(0.35)} initial="hidden" animate={inView ? "show" : "hidden"}
-          className="md:col-span-3"
-        >
-          {/* Animated glassmorphism border container */}
-          <div className="glass-animated-border rounded-2xl p-px">
-            <form
-              ref={formRef}
-              onSubmit={handleSubmit}
-              className="rounded-2xl bg-obsidian/60 backdrop-blur-xl p-7 space-y-5"
-            >
-              <div className="grid sm:grid-cols-2 gap-5">
+        {/* Form */}
+        <motion.div variants={fadeUp(0.2)} initial="hidden" animate={inView ? "show" : "hidden"}
+          className="md:col-span-3">
+          <div className="ide-window">
+            <div className="ide-titlebar">
+              <div className="flex items-center gap-1.5 px-3">
+                <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                <div className="browser-dot" style={{ background: "#28C840" }} />
+              </div>
+              <div className="ide-tab active">
+                <div className="ide-tab-dot" style={{ background: "#DCDCAA" }} />
+                send_message.ts
+              </div>
+            </div>
+
+            <form ref={formRef} onSubmit={handleSubmit} style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* Line comment */}
+              <div style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#6A9955" }}>
+                {"// Fill in the fields below to send a message"}
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-muted font-inter mb-1.5 block">Name</label>
-                  {/* EmailJS template variable: {{from_name}} */}
-                  <input
-                    name="from_name"
-                    required
-                    placeholder="Your full name"
-                    className={inputClass}
-                  />
+                  <label style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#9CDCFE", display: "block", marginBottom: 5 }}>
+                    from_name<span style={{ color: "#808080" }}>:</span>
+                  </label>
+                  <input name="from_name" required placeholder="Your full name"
+                    className="ide-input" />
                 </div>
                 <div>
-                  <label className="text-xs text-muted font-inter mb-1.5 block">Email</label>
-                  {/* EmailJS template variable: {{reply_to}} */}
-                  <input
-                    name="reply_to"
-                    type="email"
-                    required
-                    placeholder="your@email.com"
-                    className={inputClass}
-                  />
+                  <label style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#9CDCFE", display: "block", marginBottom: 5 }}>
+                    reply_to<span style={{ color: "#808080" }}>:</span>
+                  </label>
+                  <input name="reply_to" type="email" required placeholder="your@email.com"
+                    className="ide-input" />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-muted font-inter mb-1.5 block">Subject</label>
-                {/* EmailJS template variable: {{subject}} */}
-                <input
-                  name="subject"
-                  required
-                  placeholder="Job opportunity / Project inquiry / etc."
-                  className={inputClass}
-                />
+                <label style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#9CDCFE", display: "block", marginBottom: 5 }}>
+                  subject<span style={{ color: "#808080" }}>:</span>
+                </label>
+                <input name="subject" required placeholder="Job opportunity / Project inquiry / etc."
+                  className="ide-input" />
               </div>
 
               <div>
-                <label className="text-xs text-muted font-inter mb-1.5 block">Message</label>
-                {/* EmailJS template variable: {{message}} */}
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
+                <label style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#9CDCFE", display: "block", marginBottom: 5 }}>
+                  message<span style={{ color: "#808080" }}>:</span>
+                </label>
+                <textarea name="message" required rows={5}
                   placeholder="Tell me about the role or project..."
-                  className={`${inputClass} resize-none`}
-                />
+                  className="ide-input" style={{ resize: "none" }} />
               </div>
 
-              {/* Submit row */}
-              <div className="flex items-center gap-4 flex-wrap">
-                <button
-                  type="submit"
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <button type="submit"
                   disabled={status === "sending" || status === "success"}
-                  className="flex items-center gap-2 px-7 py-3 rounded-full font-grotesk font-semibold text-sm transition-all duration-300 disabled:opacity-60"
                   style={{
-                    background: "linear-gradient(135deg, #0ea5e9, #22c55e)",
-                    color: "#0a0a0a",
-                    boxShadow: status === "idle" ? "0 0 0 0 transparent" : undefined,
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "8px 20px", borderRadius: 4,
+                    background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.4)",
+                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6",
+                    transition: "all 0.2s", opacity: status === "sending" || status === "success" ? 0.6 : 1,
                   }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                      "0 0 24px rgba(14,165,233,0.5)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
-                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.25)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.15)"; }}
                 >
-                  {status === "sending" ? (
-                    <><Loader2 size={14} className="animate-spin" /> Sending…</>
-                  ) : status === "success" ? (
-                    <><CheckCircle size={14} /> Sent!</>
-                  ) : (
-                    <><Send size={14} /> Send Message</>
-                  )}
+                  {status === "sending" ? <><Loader2 size={12} className="animate-spin" /> sending...</>
+                    : status === "success" ? <><CheckCircle size={12} /> sent!</>
+                    : <><Send size={12} /> send_message()</>}
                 </button>
 
-                {/* Toast messages */}
                 {status === "success" && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-1.5 text-xs text-cypress font-inter"
-                  >
-                    <CheckCircle size={13} />
-                    Message sent! I&apos;ll reply within 24h.
+                  <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                    style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#4EC9B0", display: "flex", alignItems: "center", gap: 5 }}>
+                    <CheckCircle size={11} /> {"// message sent! I'll reply within 24h."}
                   </motion.span>
                 )}
                 {status === "error" && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-1.5 text-xs text-red-400 font-inter"
-                  >
-                    <AlertCircle size={13} />
-                    Failed to send. Please try again or email directly.
+                  <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                    style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#F44747", display: "flex", alignItems: "center", gap: 5 }}>
+                    <AlertCircle size={11} /> {"// error: please try again or email directly."}
                   </motion.span>
                 )}
               </div>

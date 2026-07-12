@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import {
-  Github, Linkedin, Facebook, Instagram,
-  MapPin, Sparkles, FileText, X, Download, Eye, ArrowRight,
-} from "lucide-react";
+import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, Eye, ArrowRight } from "lucide-react";
+
+const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation"];
+const CV = "/images/CV/CV Resume.png";
 
 const socials = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -15,99 +15,126 @@ const socials = [
   { icon: Instagram, href: "https://www.instagram.com/jqnllyd",                       label: "Instagram" },
 ];
 
-const ROLES = ["Full-Stack Developer", "QA Engineer", "Mobile Developer", "Laravel Developer"];
-const CV = "/images/CV/CV Resume.png";
-
-const up = (d = 0) => ({
-  hidden: { opacity: 0, y: 24 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.6, delay: d, ease: [0.22,1,0.36,1] as number[] } },
-});
+function SyntaxName() {
+  return (
+    <div style={{ fontFamily: "'Fira Code', monospace", lineHeight: 1.15 }}>
+      <div style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)", fontWeight: 600 }}>
+        <span style={{ color: "#C586C0" }}>const </span>
+        <span style={{ color: "#9CDCFE" }}>developer</span>
+        <span style={{ color: "#808080" }}> = </span>
+        <span style={{ color: "#808080" }}>{"{"}</span>
+      </div>
+      <div style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.6rem)", fontWeight: 600, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+        <span style={{ color: "#9CDCFE" }}>name</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#CE9178" }}>&quot;Jhon Lloyd Samson&quot;</span>
+        <span style={{ color: "#808080" }}>,</span>
+      </div>
+      <div style={{ fontSize: "clamp(1rem, 2.5vw, 1.8rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+        <span style={{ color: "#9CDCFE" }}>location</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#CE9178" }}>&quot;Davao del Norte, PH&quot;</span>
+        <span style={{ color: "#808080" }}>,</span>
+      </div>
+      <div style={{ fontSize: "clamp(1rem, 2.5vw, 1.8rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+        <span style={{ color: "#9CDCFE" }}>status</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#CE9178" }}>&quot;</span>
+        <span style={{ color: "#22C55E" }}>open to work</span>
+        <span style={{ color: "#CE9178" }}>&quot;</span>
+        <span style={{ color: "#808080" }}>,</span>
+      </div>
+      <div style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)", fontWeight: 600 }}>
+        <span style={{ color: "#808080" }}>{"}"}</span>
+        <span style={{ color: "#808080" }}>;</span>
+      </div>
+    </div>
+  );
+}
 
 export default function HeroSection() {
-  const [cvOpen,    setCvOpen]    = useState(false);
-  const [roleIndex, setRoleIndex] = useState(0);
+  const [cvOpen, setCvOpen] = useState(false);
+  const [roleIdx, setRoleIdx] = useState(0);
   const [roleVisible, setRoleVisible] = useState(true);
 
-  // Cycle roles: fade out → swap text → fade in
   useEffect(() => {
-    const interval = setInterval(() => {
+    const iv = setInterval(() => {
       setRoleVisible(false);
-      setTimeout(() => {
-        setRoleIndex(i => (i + 1) % ROLES.length);
-        setRoleVisible(true);
-      }, 350);
+      setTimeout(() => { setRoleIdx(i => (i + 1) % ROLES.length); setRoleVisible(true); }, 350);
     }, 2800);
-    return () => clearInterval(interval);
+    return () => clearInterval(iv);
   }, []);
 
+  const closeCV = useCallback(() => setCvOpen(false), []);
   useEffect(() => {
-    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") setCvOpen(false); };
+    const fn = (e: KeyboardEvent) => { if (e.key === "Escape") closeCV(); };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, []);
+  }, [closeCV]);
 
   return (
     <>
-      <section
-        className="relative min-h-screen flex items-center"
-        style={{ background: "transparent" }}
-      >
-        {/* subtle center glow — complements the canvas */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(14,165,233,0.05) 0%, transparent 70%)" }}
-        />
+      <section className="relative min-h-screen flex items-center" style={{ background: "transparent" }}>
+        <div className="section-wrap w-full pt-20">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-        <div className="section-wrap w-full pt-28">
-          <div className="flex flex-col lg:flex-row items-center gap-14 lg:gap-20">
-
-            {/* ── Left column ── */}
+            {/* Left: Avatar + socials */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, ease: [0.22,1,0.36,1] }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col items-center gap-5 shrink-0"
             >
-              {/* Avatar */}
-              <div className="relative">
-                <motion.div
-                  className="absolute -inset-[3px] rounded-full"
-                  style={{ background: "conic-gradient(from 0deg, #0ea5e9, #22c55e, #0ea5e9)", opacity: 0.7 }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
-                />
-                <div className="relative w-40 h-40 rounded-full overflow-hidden" style={{ border: "2px solid rgba(255,255,255,0.08)" }}>
-                  <Image src="/images/profile/avatar.jpg" alt="Jhon Lloyd Samson" fill className="object-cover" priority />
+              {/* IDE window wrapping avatar */}
+              <div className="ide-window" style={{ width: 200 }}>
+                <div className="ide-titlebar">
+                  <div className="flex items-center gap-1.5 px-3">
+                    <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                    <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                    <div className="browser-dot" style={{ background: "#28C840" }} />
+                  </div>
+                  <div className="ide-tab active" style={{ fontSize: 10 }}>
+                    <div className="ide-tab-dot" style={{ background: "#CE9178" }} />
+                    avatar.jpg
+                  </div>
                 </div>
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full"
-                  style={{ background: "#0d1526", border: "1px solid rgba(34,197,94,0.3)" }}>
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cypress opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cypress" />
-                  </span>
-                  <span className="text-[10px] font-inter" style={{ color: "#22c55e" }}>Open to work</span>
+                <div style={{ padding: 12, background: "#1E1E1E" }}>
+                  <div className="relative" style={{ borderRadius: 6, overflow: "hidden", aspectRatio: "1" }}>
+                    <Image src="/images/profile/avatar.jpg" alt="Jhon Lloyd Samson" fill className="object-cover" priority />
+                  </div>
+                  {/* Status */}
+                  <div style={{
+                    marginTop: 10, display: "flex", alignItems: "center", gap: 6,
+                    fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955",
+                  }}>
+                    <span style={{ color: "#808080" }}>// </span>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full" style={{ background: "#22C55E", opacity: 0.75 }} />
+                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22C55E" }} />
+                    </span>
+                    open to work
+                  </div>
+                  {/* Location */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#569CD6" }}>
+                    <MapPin size={9} />
+                    Davao del Norte, PH
+                  </div>
                 </div>
-              </div>
-
-              {/* Location */}
-              <div className="flex items-center gap-1.5 text-xs font-inter" style={{ color: "#64748b" }}>
-                <MapPin size={11} style={{ color: "#0ea5e9" }} />
-                Davao del Norte, PH
               </div>
 
               {/* CV thumbnail */}
               <motion.button
                 onClick={() => setCvOpen(true)}
-                whileHover={{ scale: 1.05, y: -3 }}
+                whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="group relative w-24 rounded-xl overflow-hidden"
-                style={{ border: "1px solid rgba(14,165,233,0.2)", boxShadow: "0 4px 24px rgba(14,165,233,0.1)" }}
+                className="group relative rounded-lg overflow-hidden"
+                style={{ width: 80, border: "1px solid #3E3E42" }}
               >
-                <Image src={CV} alt="CV" width={96} height={136} className="w-full object-cover" />
+                <Image src={CV} alt="CV" width={80} height={113} className="w-full object-cover" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: "rgba(8,12,20,0.8)" }}>
-                  <Eye size={14} style={{ color: "#0ea5e9" }} />
-                  <span className="text-[9px] font-inter text-white">View CV</span>
+                  style={{ background: "rgba(30,30,30,0.85)" }}>
+                  <Eye size={12} style={{ color: "#569CD6" }} />
+                  <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#D4D4D4" }}>view cv</span>
                 </div>
               </motion.button>
 
@@ -115,95 +142,133 @@ export default function HeroSection() {
               <div className="flex gap-2">
                 {socials.map(({ icon: Icon, href, label }) => (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                    className="w-9 h-9 glass rounded-full flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5"
-                    style={{ color: "#64748b" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#0ea5e9")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#64748b")}
+                    style={{
+                      width: 32, height: 32, borderRadius: 4,
+                      border: "1px solid #3E3E42", background: "#252526",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#858585", transition: "all 0.2s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
                   >
-                    <Icon size={14} />
+                    <Icon size={13} />
                   </a>
                 ))}
               </div>
             </motion.div>
 
-            {/* ── Right column ── */}
+            {/* Right: Syntax hero text */}
             <div className="flex-1 text-center lg:text-left">
-              <motion.div variants={up(0)} initial="hidden" animate="show"
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-6 text-xs font-inter"
-                style={{ background: "rgba(14,165,233,0.08)", border: "1px solid rgba(14,165,233,0.2)", color: "#0ea5e9" }}>
-                <Sparkles size={11} /> Software Developer & QA Engineer
+              {/* Comment header */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#6A9955", marginBottom: 16 }}
+              >
+                {"/**"}
+                <br />
+                {" * @author Jhon Lloyd Samson"}
+                <br />
+                {" * @role "}
+                <motion.span
+                  key={roleIdx}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: roleVisible ? 1 : 0 }}
+                  transition={{ duration: 0.25 }}
+                  style={{ color: "#4EC9B0" }}
+                >
+                  {ROLES[roleIdx]}
+                </motion.span>
+                <br />
+                {" * @location Davao del Norte, Philippines"}
+                <br />
+                {" */"}
               </motion.div>
 
-              <motion.h1 variants={up(0.08)} initial="hidden" animate="show"
-                className="font-grotesk font-bold leading-[1.08] mb-5"
-                style={{ fontSize: "clamp(2.4rem, 6vw, 4.2rem)" }}>
-                Building{" "}
-                <span className="gradient-text-nautical">Robust</span>
-                <br />
-                Systems &amp;{" "}
-                <span className="gradient-text">Automating</span>
-                <br />
-                Quality.
-              </motion.h1>
+              {/* Main syntax name */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="text-left"
+              >
+                <SyntaxName />
+              </motion.div>
 
-              <motion.p variants={up(0.16)} initial="hidden" animate="show"
-                className="font-inter text-base leading-relaxed mb-3 max-w-lg"
-                style={{ color: "#94a3b8" }}>
-                Hi, I&apos;m{" "}
-                <span style={{ color: "#f1f5f9", fontWeight: 600 }}>Jhon Lloyd Samson</span> — a developer
-                who builds full-stack systems by day and breaks them (on purpose) by night.
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#858585", marginTop: 20, maxWidth: 480, lineHeight: 1.7 }}
+              >
+                Building full-stack systems by day, breaking them on purpose by night.
+                {" "}<span style={{ color: "#D4D4D4" }}>486h QA OJT</span> at Wela Online Corporation.
+                Capstone: <span style={{ color: "#4EC9B0" }}>Maritime Licensing System</span>.
               </motion.p>
 
-              {/* Role ticker */}
-              <motion.div variants={up(0.22)} initial="hidden" animate="show"
-                className="flex items-center gap-2 mb-8 justify-center lg:justify-start">
-                <span className="text-xs font-inter" style={{ color: "#64748b" }}>Currently:</span>
-                <motion.span
-                  key={roleIndex}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: roleVisible ? 1 : 0, y: roleVisible ? 0 : -6 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="text-xs font-mono-code"
-                  style={{ color: "#0ea5e9" }}
-                >
-                  {ROLES[roleIndex]}
-                </motion.span>
-              </motion.div>
-
               {/* CTAs */}
-              <motion.div variants={up(0.28)} initial="hidden" animate="show"
-                className="flex flex-wrap gap-3 justify-center lg:justify-start mb-10">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24, justifyContent: "center" }}
+                className="lg:justify-start"
+              >
                 <a href="#projects"
-                  className="group flex items-center gap-2 px-6 py-3 rounded-full font-grotesk font-semibold text-sm transition-all duration-300 hover:scale-[1.03]"
-                  style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#080c14", boxShadow: "0 0 0 0 rgba(14,165,233,0)" }}
-                  onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 0 32px rgba(14,165,233,0.4)")}
-                  onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 0 0 0 rgba(14,165,233,0)")}>
-                  View Projects <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "8px 18px", borderRadius: 4,
+                    background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.4)",
+                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6",
+                    textDecoration: "none", transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.25)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.15)"; }}
+                >
+                  viewProjects() <ArrowRight size={12} />
                 </a>
                 <a href="#contact"
-                  className="flex items-center gap-2 px-6 py-3 rounded-full font-grotesk font-semibold text-sm glass transition-all duration-300"
-                  style={{ color: "#f1f5f9", border: "1px solid rgba(14,165,233,0.2)" }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(14,165,233,0.5)")}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(14,165,233,0.2)")}>
-                  Contact Me
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "8px 18px", borderRadius: 4,
+                    background: "#252526", border: "1px solid #3E3E42",
+                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#858585",
+                    textDecoration: "none", transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
+                >
+                  contact.send()
                 </a>
                 <button onClick={() => setCvOpen(true)}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full font-inter text-sm glass transition-all duration-300"
-                  style={{ color: "#94a3b8", border: "1px solid rgba(255,255,255,0.07)" }}
-                  onMouseEnter={e => (e.currentTarget.style.color = "#f1f5f9")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#94a3b8")}>
-                  <FileText size={13} /> View CV
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "8px 18px", borderRadius: 4,
+                    background: "#252526", border: "1px solid #3E3E42",
+                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#858585",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; }}
+                >
+                  <FileText size={12} /> resume.open()
                 </button>
               </motion.div>
 
               {/* Stats */}
-              <motion.div variants={up(0.34)} initial="hidden" animate="show"
-                className="flex gap-8 justify-center lg:justify-start pt-6"
-                style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                {[["4+","Years Dev"],["486h","QA OJT"],["3+","Certs"]].map(([v,l]) => (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.65 }}
+                style={{ display: "flex", gap: 24, marginTop: 28, paddingTop: 20, borderTop: "1px solid #3E3E42", justifyContent: "center" }}
+                className="lg:justify-start"
+              >
+                {[["4+", "years_dev"], ["486h", "qa_ojt"], ["3+", "certs"]].map(([v, l]) => (
                   <div key={l}>
-                    <p className="font-grotesk font-bold text-xl gradient-text-nautical">{v}</p>
-                    <p className="text-xs font-inter mt-0.5" style={{ color: "#64748b" }}>{l}</p>
+                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 20, fontWeight: 600, color: "#569CD6" }}>{v}</p>
+                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955", marginTop: 2 }}>// {l}</p>
                   </div>
                 ))}
               </motion.div>
@@ -213,54 +278,59 @@ export default function HeroSection() {
 
         {/* Scroll cue */}
         <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          animate={{ y: [0,8,0] }} transition={{ duration: 2, repeat: Infinity }}>
-          <span className="text-[9px] tracking-[0.3em] uppercase font-inter" style={{ color: "#475569" }}>Scroll</span>
-          <div className="w-px h-8" style={{ background: "linear-gradient(180deg,#0ea5e9,transparent)" }} />
+          animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#3E3E42", letterSpacing: "0.3em" }}>scroll</span>
+          <div style={{ width: 1, height: 28, background: "linear-gradient(180deg,#569CD6,transparent)" }} />
         </motion.div>
       </section>
 
-      {/* ── CV Modal ── */}
+      {/* CV Modal */}
       <AnimatePresence>
         {cvOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 flex items-center justify-center p-4"
-            style={{ zIndex: 200, background: "rgba(8,12,20,0.92)", backdropFilter: "blur(16px)" }}
-            onClick={() => setCvOpen(false)}
+            style={{ zIndex: 200, background: "rgba(13,13,13,0.92)", backdropFilter: "blur(16px)" }}
+            onClick={closeCV}
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="relative w-full max-w-xl"
+              className="relative w-full max-w-xl ide-window"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-3 px-1">
-                <div className="flex items-center gap-2">
-                  <FileText size={14} style={{ color: "#0ea5e9" }} />
-                  <span className="font-grotesk font-semibold text-sm" style={{ color: "#f1f5f9" }}>
-                    Jhon Lloyd Samson — CV Resume
-                  </span>
+              <div className="ide-titlebar">
+                <div className="flex items-center gap-1.5 px-3">
+                  <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                  <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                  <div className="browser-dot" style={{ background: "#28C840" }} />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="ide-tab active">
+                  <div className="ide-tab-dot" style={{ background: "#CE9178" }} />
+                  CV_Resume.pdf
+                </div>
+                <div style={{ flex: 1 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 12 }}>
                   <a href={CV} download="JhonLloyd_Samson_CV.png"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-inter"
-                    style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#080c14" }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 5,
+                      padding: "3px 10px", borderRadius: 3,
+                      background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.3)",
+                      fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#569CD6",
+                      textDecoration: "none",
+                    }}
                     onClick={e => e.stopPropagation()}>
-                    <Download size={11} /> Download
+                    <Download size={10} /> download
                   </a>
-                  <button onClick={() => setCvOpen(false)}
-                    className="w-8 h-8 glass rounded-full flex items-center justify-center"
-                    style={{ color: "#64748b" }}>
+                  <button onClick={closeCV}
+                    style={{ background: "none", border: "none", color: "#858585", padding: 4 }}>
                     <X size={14} />
                   </button>
                 </div>
               </div>
-              <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(14,165,233,0.2)", boxShadow: "0 0 60px rgba(14,165,233,0.12)" }}>
-                <Image src={CV} alt="CV Resume" width={800} height={1131} className="w-full h-auto" priority />
+              <div style={{ padding: 16, background: "#1E1E1E" }}>
+                <Image src={CV} alt="CV Resume" width={800} height={1131} className="w-full h-auto rounded" priority />
               </div>
-              <p className="text-center text-xs font-inter mt-3" style={{ color: "#475569" }}>
-                Press <kbd className="px-1.5 py-0.5 rounded glass text-[10px]">Esc</kbd> or click outside to close
-              </p>
             </motion.div>
           </motion.div>
         )}

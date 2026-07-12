@@ -5,27 +5,27 @@ import { motion, useInView } from "framer-motion";
 import { Code2, ShieldCheck, GitBranch, Terminal, Quote } from "lucide-react";
 
 const SKILLS = [
-  { name: "Manual & Role-Based Testing", level: 90, color: "#22c55e" },
-  { name: "QA Documentation",            level: 88, color: "#22c55e" },
-  { name: "Cypress Automation",          level: 85, color: "#69db7c" },
-  { name: "GitHub / Version Control",    level: 85, color: "#0ea5e9" },
-  { name: "MySQL / Database Design",     level: 80, color: "#0ea5e9" },
-  { name: "Next.js / React",             level: 78, color: "#61dafb" },
-  { name: "PHP / Laravel",               level: 75, color: "#ff2d20" },
+  { name: "Manual & Role-Based Testing", level: 90, color: "#4EC9B0" },
+  { name: "QA Documentation",            level: 88, color: "#4EC9B0" },
+  { name: "Cypress Automation",          level: 85, color: "#22C55E" },
+  { name: "GitHub / Version Control",    level: 85, color: "#569CD6" },
+  { name: "MySQL / Database Design",     level: 80, color: "#569CD6" },
+  { name: "Next.js / React",             level: 78, color: "#61DAFB" },
+  { name: "PHP / Laravel",               level: 75, color: "#FF2D20" },
 ];
 
 const COMPS = [
-  { icon: ShieldCheck, label: "Quality Assurance", accent: "#22c55e" },
-  { icon: Terminal,    label: "Test Automation",   accent: "#69db7c" },
-  { icon: Code2,       label: "Full-Stack Dev",    accent: "#0ea5e9" },
-  { icon: GitBranch,   label: "Version Control",   accent: "#f05032" },
+  { icon: ShieldCheck, label: "Quality Assurance", color: "#4EC9B0" },
+  { icon: Terminal,    label: "Test Automation",   color: "#22C55E" },
+  { icon: Code2,       label: "Full-Stack Dev",    color: "#569CD6" },
+  { icon: GitBranch,   label: "Version Control",   color: "#F05032" },
 ];
 
 const TAGS = [
-  "Quality Assurance","Test Automation","Cypress","Manual Testing",
-  "Data Migration","Test Case Design","Role-Based Testing",
-  "GitHub","VS Code","Passbolt","QA Documentation","Sprint Testing",
-  "Problem-Solving","Team Collaboration","Attention to Detail",
+  "Quality Assurance", "Test Automation", "Cypress", "Manual Testing",
+  "Data Migration", "Test Case Design", "Role-Based Testing",
+  "GitHub", "VS Code", "Passbolt", "QA Documentation", "Sprint Testing",
+  "Problem-Solving", "Team Collaboration", "Attention to Detail",
 ];
 
 function TiltCard({ children, className, style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
@@ -33,15 +33,15 @@ function TiltCard({ children, className, style }: { children: React.ReactNode; c
   const move = (e: MouseEvent<HTMLDivElement>) => {
     const el = ref.current; if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width  - 0.5) * 12;
-    const y = ((e.clientY - r.top)  / r.height - 0.5) * -12;
-    el.style.transform = `perspective(900px) rotateX(${y}deg) rotateY(${x}deg) scale(1.012)`;
+    const x = ((e.clientX - r.left) / r.width - 0.5) * 10;
+    const y = ((e.clientY - r.top) / r.height - 0.5) * -10;
+    el.style.transform = `perspective(900px) rotateX(${y}deg) rotateY(${x}deg) scale(1.01)`;
   };
   const leave = () => { if (ref.current) ref.current.style.transform = "perspective(900px) rotateX(0) rotateY(0) scale(1)"; };
   return (
     <div ref={ref} onMouseMove={move} onMouseLeave={leave}
-      className={`glass glass-hover rounded-2xl transition-transform duration-200 ease-out ${className ?? ""}`}
-      style={{ willChange: "transform", ...style }}>
+      className={`ide-window glass-hover ${className ?? ""}`}
+      style={{ willChange: "transform", transition: "transform 0.2s ease-out", ...style }}>
       {children}
     </div>
   );
@@ -49,7 +49,7 @@ function TiltCard({ children, className, style }: { children: React.ReactNode; c
 
 const up = (d = 0) => ({
   hidden: { opacity: 0, y: 28 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.55, delay: d, ease: [0.22,1,0.36,1] as number[] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, delay: d, ease: [0.22, 1, 0.36, 1] as number[] } },
 });
 
 export default function BentoGrid() {
@@ -60,30 +60,44 @@ export default function BentoGrid() {
     <section id="skills" ref={ref} className="section-wrap">
       <p className="section-label">Capabilities</p>
       <motion.h2 variants={up(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
-        Skills & <span className="gradient-text">Proficiency</span>
+        <span style={{ color: "#C586C0" }}>interface </span>
+        <span style={{ color: "#4EC9B0" }}>Skills</span>
+        <span style={{ color: "#808080" }}> extends </span>
+        <span style={{ color: "#DCDCAA" }}>Developer</span>
+        <span style={{ color: "#808080" }}> {"{ ... }"}</span>
       </motion.h2>
 
-      {/* Row 1: skill bars (wide) + 2 competency cards */}
+      {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        {/* Skill bars */}
         <motion.div variants={up(0.1)} initial="hidden" animate={inView ? "show" : "hidden"} className="md:col-span-2">
-          <TiltCard className="p-7 h-full">
-            <div className="flex items-center gap-2 mb-6">
-              <Code2 size={14} style={{ color: "#0ea5e9" }} />
-              <p className="font-grotesk font-semibold text-sm" style={{ color: "#f1f5f9" }}>Technical Proficiency</p>
+          <TiltCard>
+            <div className="ide-titlebar">
+              <div className="flex items-center gap-1.5 px-3">
+                <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                <div className="browser-dot" style={{ background: "#28C840" }} />
+              </div>
+              <div className="ide-tab active">
+                <div className="ide-tab-dot" style={{ background: "#569CD6" }} />
+                proficiency.ts
+              </div>
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="ide-body" style={{ fontSize: 12 }}>
+              <div style={{ color: "#6A9955", marginBottom: 12 }}>{"// Technical Proficiency — skill_level: number (0–100)"}</div>
               {SKILLS.map((s, i) => (
-                <div key={s.name}>
-                  <div className="flex justify-between text-xs font-inter mb-1.5">
-                    <span style={{ color: "#94a3b8" }}>{s.name}</span>
-                    <span className="font-mono-code" style={{ color: s.color }}>{s.level}%</span>
+                <div key={s.name} style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#9CDCFE" }}>{s.name}</span>
+                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: s.color }}>{s.level}</span>
                   </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <motion.div className="h-full rounded-full"
-                      style={{ background: `linear-gradient(90deg,${s.color},${s.color}70)` }}
+                  <div style={{ height: 3, background: "#2D2D30", borderRadius: 99, overflow: "hidden" }}>
+                    <motion.div
+                      style={{ height: "100%", background: `linear-gradient(90deg,${s.color},${s.color}60)`, borderRadius: 99 }}
                       initial={{ width: 0 }}
                       animate={inView ? { width: `${s.level}%` } : { width: 0 }}
-                      transition={{ duration: 1.1, delay: 0.3 + i * 0.07, ease: "easeOut" }} />
+                      transition={{ duration: 1.1, delay: 0.3 + i * 0.07, ease: "easeOut" }}
+                    />
                   </div>
                 </div>
               ))}
@@ -91,17 +105,23 @@ export default function BentoGrid() {
           </TiltCard>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+        {/* Competency cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="md:grid-cols-1">
           {COMPS.map((c, i) => {
             const Icon = c.icon;
             return (
               <motion.div key={i} variants={up(0.15 + i * 0.05)} initial="hidden" animate={inView ? "show" : "hidden"}>
-                <TiltCard className="p-5 flex flex-col items-center justify-center text-center gap-3">
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center"
-                    style={{ background: `${c.accent}12`, border: `1px solid ${c.accent}25` }}>
-                    <Icon size={18} style={{ color: c.accent }} />
+                <TiltCard>
+                  <div style={{ padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 10, minHeight: 90 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 6,
+                      background: `${c.color}12`, border: `1px solid ${c.color}25`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Icon size={16} style={{ color: c.color }} />
+                    </div>
+                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#D4D4D4" }}>{c.label}</p>
                   </div>
-                  <p className="text-xs font-inter font-medium" style={{ color: "#f1f5f9" }}>{c.label}</p>
                 </TiltCard>
               </motion.div>
             );
@@ -109,29 +129,57 @@ export default function BentoGrid() {
         </div>
       </div>
 
-      {/* Row 2: quote + tags */}
+      {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Quote */}
         <motion.div variants={up(0.3)} initial="hidden" animate={inView ? "show" : "hidden"}>
-          <TiltCard className="p-7 h-full flex flex-col justify-between gap-4">
-            <Quote size={20} style={{ color: "rgba(14,165,233,0.3)" }} />
-            <p className="font-inter text-sm leading-relaxed italic" style={{ color: "#f1f5f9" }}>
-              &ldquo;I don&apos;t just write code — I write code that works, and then I prove it.
-              Quality isn&apos;t a phase; it&apos;s the whole process.&rdquo;
-            </p>
-            <div className="flex items-center gap-3">
-              <div style={{ width: 32, height: 1, background: "linear-gradient(90deg,#0ea5e9,#22c55e)" }} />
-              <span className="text-xs font-inter" style={{ color: "#64748b" }}>Jhon Lloyd Samson</span>
+          <TiltCard style={{ height: "100%" }}>
+            <div className="ide-titlebar">
+              <div className="flex items-center gap-1.5 px-3">
+                <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                <div className="browser-dot" style={{ background: "#28C840" }} />
+              </div>
+              <div className="ide-tab active">
+                <div className="ide-tab-dot" style={{ background: "#6A9955" }} />
+                philosophy.md
+              </div>
+            </div>
+            <div className="ide-body" style={{ fontSize: 12, display: "flex", flexDirection: "column", gap: 12, height: "calc(100% - 35px)" }}>
+              <Quote size={18} style={{ color: "rgba(86,156,214,0.3)" }} />
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#D4D4D4", lineHeight: 1.7, fontStyle: "italic", flex: 1 }}>
+                &ldquo;I don&apos;t just write code — I write code that works, and then I prove it.
+                Quality isn&apos;t a phase; it&apos;s the whole process.&rdquo;
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 24, height: 1, background: "linear-gradient(90deg,#569CD6,#4EC9B0)" }} />
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955" }}>// Jhon Lloyd Samson</span>
+              </div>
             </div>
           </TiltCard>
         </motion.div>
 
+        {/* Tags */}
         <motion.div variants={up(0.35)} initial="hidden" animate={inView ? "show" : "hidden"} className="md:col-span-2">
-          <TiltCard className="p-7 h-full">
-            <p className="font-grotesk font-semibold text-sm mb-4" style={{ color: "#f1f5f9" }}>Core Competencies</p>
-            <div className="flex flex-wrap gap-2">
-              {TAGS.map(tag => (
-                <span key={tag} className="skill-tag skill-glow-default">{tag}</span>
-              ))}
+          <TiltCard>
+            <div className="ide-titlebar">
+              <div className="flex items-center gap-1.5 px-3">
+                <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                <div className="browser-dot" style={{ background: "#28C840" }} />
+              </div>
+              <div className="ide-tab active">
+                <div className="ide-tab-dot" style={{ background: "#C586C0" }} />
+                competencies.ts
+              </div>
+            </div>
+            <div className="ide-body" style={{ fontSize: 12 }}>
+              <div style={{ color: "#6A9955", marginBottom: 10 }}>{"// Core Competencies"}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {TAGS.map(tag => (
+                  <span key={tag} className="skill-tag">{tag}</span>
+                ))}
+              </div>
             </div>
           </TiltCard>
         </motion.div>

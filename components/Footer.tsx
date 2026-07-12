@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Linkedin, Facebook, Instagram, ArrowUp, Heart } from "lucide-react";
+import { Github, Linkedin, Facebook, Instagram, ArrowUp, Heart, GitBranch, Wifi } from "lucide-react";
 
 const SOCIALS = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -11,93 +11,133 @@ const SOCIALS = [
 ];
 
 const LINKS = [
-  { label: "About",    href: "#about" },
-  { label: "Stack",    href: "#stack" },
-  { label: "Projects", href: "#projects" },
-  { label: "Certs",    href: "#certs" },
-  { label: "Contact",  href: "#contact" },
+  { label: "about.ts",    href: "#about" },
+  { label: "stack.ts",    href: "#stack" },
+  { label: "projects.ts", href: "#projects" },
+  { label: "certs.ts",    href: "#certs" },
+  { label: "contact.ts",  href: "#contact" },
 ];
 
 export default function Footer() {
   return (
     <footer style={{ position: "relative", marginTop: "2rem" }}>
-      {/* Gradient divider */}
-      <div style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(14,165,233,0.35),rgba(34,197,94,0.35),transparent)" }} />
+      {/* Divider */}
+      <div style={{ height: 1, background: "#3E3E42" }} />
 
-      {/* Top glow */}
-      <div style={{
-        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        width: 400, height: 120, pointerEvents: "none",
-        background: "radial-gradient(ellipse,rgba(14,165,233,0.06),transparent)",
-        filter: "blur(40px)",
-      }} />
-
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid sm:grid-cols-3 gap-8 mb-10">
-          {/* Brand */}
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-mono-code font-bold"
-                style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", color: "#020408" }}>
-                JL
-              </span>
-              <span className="font-grotesk font-bold text-lg gradient-text-nautical">JayEL</span>
+      <div style={{ background: "#252526" }}>
+        <div style={{ maxWidth: "72rem", margin: "0 auto", padding: "3rem 1.5rem 2rem" }}>
+          <div className="grid sm:grid-cols-3 gap-8 mb-8">
+            {/* Brand */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{
+                  width: 28, height: 28, borderRadius: 4,
+                  background: "linear-gradient(135deg,#569CD6,#4EC9B0)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: "'Fira Code', monospace", fontSize: 10, fontWeight: 700, color: "#1E1E1E",
+                }}>JL</span>
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 13, color: "#9CDCFE" }}>
+                  jhon-lloyd<span style={{ color: "#808080" }}>/</span><span style={{ color: "#CE9178" }}>portfolio</span>
+                </span>
+              </div>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#6A9955", lineHeight: 1.7, maxWidth: 200 }}>
+                {"// Building robust systems & automating quality — one commit at a time."}
+              </p>
             </div>
-            <p className="text-xs font-inter leading-relaxed" style={{ color: "#475569", maxWidth: 200 }}>
-              Building robust systems & automating quality — one commit at a time.
-            </p>
-          </div>
 
-          {/* Nav */}
-          <div className="flex flex-col gap-2">
-            <p className="text-xs font-grotesk font-semibold tracking-wide mb-1" style={{ color: "#f1f5f9" }}>Navigation</p>
-            {LINKS.map(l => (
-              <a key={l.href} href={l.href}
-                className="text-xs font-inter w-fit transition-colors duration-200"
-                style={{ color: "#475569" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#0ea5e9"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#475569"; }}>
-                {l.label}
-              </a>
-            ))}
-          </div>
-
-          {/* Socials */}
-          <div className="flex flex-col gap-3">
-            <p className="text-xs font-grotesk font-semibold tracking-wide" style={{ color: "#f1f5f9" }}>Connect</p>
-            <div className="flex gap-2 flex-wrap">
-              {SOCIALS.map(({ icon: Icon, href, label }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                  className="w-9 h-9 glass rounded-full flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5"
-                  style={{ color: "#475569" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#0ea5e9"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#475569"; }}>
-                  <Icon size={14} />
+            {/* Nav */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955", marginBottom: 4 }}>
+                {"// navigation"}
+              </p>
+              {LINKS.map(l => (
+                <a key={l.href} href={l.href}
+                  style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#858585", textDecoration: "none", width: "fit-content", transition: "color 0.15s" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; }}>
+                  {l.label}
                 </a>
               ))}
             </div>
-            <p className="text-xs font-inter" style={{ color: "#475569" }}>Jhonlloydsamson11@gmail.com</p>
+
+            {/* Socials */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955" }}>
+                {"// connect"}
+              </p>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {SOCIALS.map(({ icon: Icon, href, label }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                    style={{
+                      width: 30, height: 30, borderRadius: 4,
+                      border: "1px solid #3E3E42", background: "#2D2D30",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#858585", transition: "all 0.2s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}>
+                    <Icon size={12} />
+                  </a>
+                ))}
+              </div>
+              <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955" }}>
+                Jhonlloydsamson11@gmail.com
+              </p>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: "#3E3E42", marginBottom: "1.5rem" }} />
+
+          {/* Bottom row */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955", display: "flex", alignItems: "center", gap: 6 }}>
+              {"// © "}{new Date().getFullYear()}{" Jhon Lloyd M. Samson · Made with "}
+              <Heart size={9} style={{ color: "#F44747", fill: "#F44747" }} />
+              {" in Davao del Norte"}
+            </p>
+            <motion.button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              whileHover={{ y: -2 }} whileTap={{ scale: 0.95 }}
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                padding: "5px 12px", borderRadius: 4,
+                background: "#2D2D30", border: "1px solid #3E3E42",
+                fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
+            >
+              <ArrowUp size={10} /> scroll_to_top()
+            </motion.button>
           </div>
         </div>
 
-        <div style={{ height: 1, background: "rgba(255,255,255,0.04)", marginBottom: "1.5rem" }} />
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-inter flex items-center gap-1.5" style={{ color: "#475569" }}>
-            © {new Date().getFullYear()} Jhon Lloyd M. Samson. Made with
-            <Heart size={11} style={{ color: "#f87171", fill: "#f87171" }} />
-            in Davao del Norte.
-          </p>
-          <motion.button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 glass rounded-full text-xs font-inter transition-all"
-            style={{ color: "#475569" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#0ea5e9"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#475569"; }}
-          >
-            <ArrowUp size={11} /> Back to top
-          </motion.button>
+        {/* IDE Status Bar */}
+        <div style={{
+          height: 22, background: "#007ACC",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0 12px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#fff" }}>
+              <GitBranch size={10} /> main
+            </div>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
+              ✓ 0 errors, 0 warnings
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
+              <Wifi size={10} /> TypeScript
+            </div>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
+              UTF-8
+            </span>
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
+              Ln 1, Col 1
+            </span>
+          </div>
         </div>
       </div>
     </footer>

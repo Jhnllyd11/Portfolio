@@ -22,25 +22,49 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Lenis smooth scroll — low lerp for "heavy IDE" feel
     import("lenis").then(({ default: Lenis }) => {
-      const lenis = new Lenis({ lerp: 0.08, smoothWheel: true } as ConstructorParameters<typeof Lenis>[0]);
-      const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
-      requestAnimationFrame(raf);
+      const lenis = new Lenis({
+        lerp: 0.07,
+        smoothWheel: true,
+        syncTouch: false,
+      } as ConstructorParameters<typeof Lenis>[0]);
+
+      // Wire GSAP ScrollTrigger to Lenis if available
+      Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+        ([{ default: gsap }, { ScrollTrigger }]) => {
+          gsap.registerPlugin(ScrollTrigger);
+          lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.add((time) => lenis.raf(time * 1000));
+          gsap.ticker.lagSmoothing(0);
+        }
+      ).catch(() => {
+        // Fallback: run Lenis without GSAP
+        const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
+        requestAnimationFrame(raf);
+      });
     });
   }, []);
 
   if (!mounted) return null;
-  if (loading)  return <Loader onComplete={() => setLoading(false)} />;
+  if (loading) return <Loader onComplete={() => setLoading(false)} />;
 
   return (
     <>
-      {/* z-0: fixed 3D animated background canvas */}
+      {/* z-0: fixed living syntax background */}
       <ScrollBackground />
+
+      {/* Scan line overlay */}
+      <div className="scan-line" />
+
       {/* z-9999: custom cursor */}
       <CustomCursor />
+
       {/* z-50: navbar */}
       <Navbar />
-      {/* z-10: all page sections */}
+
+      {/* z-10: page sections */}
       <main style={{ position: "relative", zIndex: 10 }}>
         <HeroSection />
         <AboutSection />

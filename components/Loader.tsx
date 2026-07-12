@@ -1,11 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const BOOT_LINES = [
+  { text: "$ initializing portfolio...", color: "#6A9955", delay: 0 },
+  { text: "> loading modules: [react, next, gsap, lenis]", color: "#9CDCFE", delay: 300 },
+  { text: "> compiling TypeScript...", color: "#569CD6", delay: 700 },
+  { text: "> running QA checks...", color: "#4EC9B0", delay: 1100 },
+  { text: "✓ build successful — jhon-lloyd-samson@portfolio", color: "#22C55E", delay: 1600 },
+];
+
 export default function Loader({ onComplete }: { onComplete: () => void }) {
+  const [visibleLines, setVisibleLines] = useState<number[]>([]);
+
   useEffect(() => {
-    const t = setTimeout(onComplete, 2400);
+    BOOT_LINES.forEach((line, i) => {
+      setTimeout(() => setVisibleLines(prev => [...prev, i]), line.delay);
+    });
+    const t = setTimeout(onComplete, 2600);
     return () => clearTimeout(t);
   }, [onComplete]);
 
@@ -13,59 +26,75 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     <AnimatePresence>
       <motion.div
         className="fixed inset-0 flex flex-col items-center justify-center"
-        style={{ background: "#020408", zIndex: 999 }}
-        exit={{ opacity: 0, scale: 1.05 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ background: "#0D0D0D", zIndex: 999 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        {/* 3D-style concentric rings */}
-        <div className="relative w-24 h-24 mb-8">
-          {/* Outer ring */}
-          <div className="absolute inset-0 rounded-full animate-spin-slow"
-            style={{ border: "1px solid rgba(14,165,233,0.15)", borderTopColor: "#0ea5e9" }} />
-          {/* Mid ring */}
-          <div className="absolute inset-3 rounded-full animate-spin-rev"
-            style={{ border: "1px solid rgba(34,197,94,0.15)", borderTopColor: "#22c55e" }} />
-          {/* Inner ring */}
-          <div className="absolute inset-6 rounded-full animate-spin-slow"
-            style={{ border: "1px solid rgba(189,0,255,0.15)", borderTopColor: "#bd00ff", animationDuration: "2s" }} />
-          {/* Core glow */}
-          <div className="absolute inset-[38%] rounded-full animate-pulse-glow"
-            style={{ background: "radial-gradient(circle, rgba(14,165,233,0.8), rgba(34,197,94,0.4))" }} />
-        </div>
-
-        {/* Name */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
+        {/* IDE window */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="font-grotesk font-bold text-lg tracking-[0.15em]"
-          style={{ background: "linear-gradient(135deg,#0ea5e9,#22c55e)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+          transition={{ duration: 0.4 }}
+          style={{ width: "min(480px, 90vw)" }}
         >
-          JHON LLOYD
-        </motion.p>
+          {/* Title bar */}
+          <div className="ide-titlebar rounded-t-lg">
+            <div className="flex items-center gap-1.5 px-3">
+              <div className="browser-dot" style={{ background: "#FF5F57" }} />
+              <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+              <div className="browser-dot" style={{ background: "#28C840" }} />
+            </div>
+            <div className="ide-tab active ml-2">
+              <div className="ide-tab-dot" style={{ background: "#569CD6" }} />
+              portfolio.ts
+            </div>
+          </div>
+
+          {/* Terminal body */}
+          <div className="terminal rounded-b-lg" style={{ borderTop: "none", borderRadius: "0 0 8px 8px" }}>
+            <div className="terminal-body" style={{ minHeight: 160 }}>
+              {BOOT_LINES.map((line, i) => (
+                <AnimatePresence key={i}>
+                  {visibleLines.includes(i) && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: line.color, marginBottom: 4 }}
+                    >
+                      {line.text}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              ))}
+              {visibleLines.length < BOOT_LINES.length && (
+                <span className="terminal-cursor" />
+              )}
+            </div>
+
+            {/* Progress bar */}
+            <div style={{ padding: "0 20px 16px" }}>
+              <div style={{ height: 2, background: "#2D2D30", borderRadius: 99, overflow: "hidden" }}>
+                <motion.div
+                  style={{ height: "100%", background: "linear-gradient(90deg,#569CD6,#4EC9B0)", borderRadius: 99 }}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2.4, ease: "easeInOut" }}
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Name below */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="font-mono-code text-xs tracking-[0.4em] mt-1"
-          style={{ color: "#334155" }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#3E3E42", marginTop: 20, letterSpacing: "0.3em" }}
         >
-          PORTFOLIO
+          JHON LLOYD SAMSON
         </motion.p>
-
-        {/* Progress bar */}
-        <motion.div
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 h-px rounded-full overflow-hidden"
-          style={{ width: 120, background: "rgba(255,255,255,0.05)" }}
-        >
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: "linear-gradient(90deg,#0ea5e9,#22c55e)" }}
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 2.2, ease: "easeInOut" }}
-          />
-        </motion.div>
       </motion.div>
     </AnimatePresence>
   );

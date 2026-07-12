@@ -3,13 +3,14 @@
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, CheckCircle2, Layers } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, Layers, CheckCircle2 } from "lucide-react";
 
 const projects = [
   {
     index: "01",
     title: "Maritime Licensing System",
     subtitle: "City Agriculture Office — Panabo City",
+    url: "localhost:8000/maritime-licensing",
     description:
       "A full-stack web-based system for fisheries and maritime licensing workflows. Handles license applications, renewals, and record management for the City Agriculture Office – Fisheries Development Center.",
     tech: ["PHP", "Laravel", "MySQL", "Bootstrap", "JavaScript"],
@@ -32,13 +33,15 @@ const projects = [
     github: "https://github.com/Jhnllyd11",
     live: null,
     period: "2024 – 2026",
-    accent: "#0ea5e9",
+    color: "#569CD6",
     type: "Full-Stack Web App",
+    file: "maritime_system.php",
   },
   {
     index: "02",
     title: "Cypress QA Automation Suite",
     subtitle: "Wela Online Corporation — DCMU",
+    url: "localhost:3000/cypress/e2e",
     description:
       "A comprehensive Cypress end-to-end test automation suite built during OJT. Covers login flows, Sprint Cycle creation, Product Backlog management, and role-based validation across multiple user types.",
     tech: ["Cypress", "JavaScript", "GitHub", "VS Code"],
@@ -52,61 +55,87 @@ const projects = [
     github: "https://github.com/Jhnllyd11",
     live: null,
     period: "Feb 2026 – May 2026",
-    accent: "#22c55e",
+    color: "#4EC9B0",
     type: "QA Automation",
+    file: "cypress_suite.cy.ts",
   },
 ];
 
-function ImageCarousel({ images, accent }: { images: string[]; accent: string }) {
+function ImageCarousel({ images, color }: { images: string[]; color: string }) {
   const [idx, setIdx] = useState(0);
-  if (!images.length) return (
-    <div className="w-full aspect-video rounded-xl flex flex-col items-center justify-center gap-3"
-      style={{ background: `${accent}08`, border: `1px solid ${accent}20` }}>
-      <Layers size={32} style={{ color: accent, opacity: 0.4 }} />
-      <p className="text-muted text-xs font-inter">Private repository</p>
-    </div>
-  );
+
+  if (!images.length) {
+    return (
+      <div style={{
+        width: "100%", aspectRatio: "16/9", borderRadius: 6,
+        background: "#1E1E1E", border: `1px solid ${color}20`,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10,
+      }}>
+        <Layers size={28} style={{ color, opacity: 0.3 }} />
+        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#3E3E42" }}>
+          // private repository
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full aspect-video rounded-xl overflow-hidden group"
-      style={{ background: "#0f172a" }}>
+    <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: 6, overflow: "hidden", background: "#0D0D0D" }}
+      className="group">
       <AnimatePresence mode="wait">
         <motion.div key={idx}
-          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }} className="absolute inset-0">
+          initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
+          transition={{ duration: 0.25 }} style={{ position: "absolute", inset: 0 }}>
           <Image src={images[idx]} alt={`Screenshot ${idx + 1}`} fill className="object-cover" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-obsidian/40 to-transparent pointer-events-none" />
-
-      <button onClick={() => setIdx((i) => (i - 1 + images.length) % images.length)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 glass rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-        <ChevronLeft size={13} />
+      <button onClick={() => setIdx(i => (i - 1 + images.length) % images.length)}
+        style={{
+          position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
+          width: 28, height: 28, borderRadius: 4, background: "rgba(30,30,30,0.85)",
+          border: "1px solid #3E3E42", color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center",
+          opacity: 0, transition: "opacity 0.2s",
+        }}
+        className="group-hover:opacity-100">
+        <ChevronLeft size={12} />
       </button>
-      <button onClick={() => setIdx((i) => (i + 1) % images.length)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 glass rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-        <ChevronRight size={13} />
+      <button onClick={() => setIdx(i => (i + 1) % images.length)}
+        style={{
+          position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+          width: 28, height: 28, borderRadius: 4, background: "rgba(30,30,30,0.85)",
+          border: "1px solid #3E3E42", color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center",
+          opacity: 0, transition: "opacity 0.2s",
+        }}
+        className="group-hover:opacity-100">
+        <ChevronRight size={12} />
       </button>
 
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+      <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 4 }}>
         {images.map((_, i) => (
           <button key={i} onClick={() => setIdx(i)}
-            className={`h-1 rounded-full transition-all duration-300 ${i === idx ? "w-5 bg-white" : "w-1.5 bg-white/30"}`} />
+            style={{
+              height: 3, borderRadius: 99, background: i === idx ? "#D4D4D4" : "rgba(255,255,255,0.25)",
+              width: i === idx ? 16 : 6, transition: "all 0.25s", border: "none",
+            }} />
         ))}
       </div>
 
-      <div className="absolute top-3 right-3 glass rounded-full px-2.5 py-1 text-[10px] font-mono-code text-muted">
-        {idx + 1} / {images.length}
+      <div style={{
+        position: "absolute", top: 8, right: 8,
+        background: "rgba(30,30,30,0.85)", border: "1px solid #3E3E42",
+        borderRadius: 3, padding: "2px 8px",
+        fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585",
+      }}>
+        {idx + 1}/{images.length}
       </div>
     </div>
   );
 }
 
-const fadeUp = (delay = 0) => ({
-  hidden: { opacity: 0, y: 36 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] } },
+const fadeUp = (d = 0) => ({
+  hidden: { opacity: 0, y: 32 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, delay: d, ease: [0.22, 1, 0.36, 1] as number[] } },
 });
 
 export default function ProjectsSection() {
@@ -114,92 +143,134 @@ export default function ProjectsSection() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="projects" ref={ref} className="section-padding max-w-6xl mx-auto">
-      <motion.p variants={fadeUp(0)} initial="hidden" animate={inView ? "show" : "hidden"}
-        className="text-maritime text-xs tracking-[0.3em] uppercase font-inter mb-2">
-        Work
-      </motion.p>
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
-        <motion.h2 variants={fadeUp(0.08)} initial="hidden" animate={inView ? "show" : "hidden"}
-          className="font-grotesk font-bold text-4xl md:text-5xl">
-          Featured <span className="gradient-text">Projects</span>
-        </motion.h2>
-        <motion.p variants={fadeUp(0.12)} initial="hidden" animate={inView ? "show" : "hidden"}
-          className="text-muted text-sm font-inter">
-          {projects.length} projects shipped
-        </motion.p>
-      </div>
+    <section id="projects" ref={ref} className="section-wrap">
+      <p className="section-label">Work</p>
+      <motion.h2 variants={fadeUp(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
+        <span style={{ color: "#C586C0" }}>const </span>
+        <span style={{ color: "#9CDCFE" }}>projects</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#4EC9B0" }}>Project</span>
+        <span style={{ color: "#808080" }}>[] = [...]</span>
+      </motion.h2>
 
-      <div className="space-y-8">
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {projects.map((p, i) => (
-          <motion.div
-            key={i}
-            variants={fadeUp(0.15 + i * 0.1)}
+          <motion.div key={i}
+            variants={fadeUp(0.1 + i * 0.1)}
             initial="hidden"
             animate={inView ? "show" : "hidden"}
-            whileHover={{ y: -4, transition: { duration: 0.25 } }}
-            className="glass glass-hover rounded-2xl overflow-hidden"
-            style={{ borderColor: `${p.accent}15` }}
           >
-            <div className="grid md:grid-cols-2 gap-0">
-              {/* Image / visual */}
-              <div className="p-6 flex flex-col gap-4">
-                <ImageCarousel images={p.images} accent={p.accent} />
-                {/* Tech tags */}
-                <div className="flex flex-wrap gap-1.5">
-                  {p.tech.map((t) => (
-                    <span key={t} className="px-2.5 py-1 rounded-full text-[11px] font-mono-code border transition-all duration-200 hover:-translate-y-0.5"
-                      style={{ borderColor: `${p.accent}25`, color: p.accent, background: `${p.accent}08` }}>
-                      {t}
-                    </span>
-                  ))}
+            {/* Browser window */}
+            <motion.div
+              className="browser-window glass-hover"
+              style={{ borderColor: `${p.color}20` }}
+              whileHover={{ y: -4, rotateX: 1, rotateY: -0.5 }}
+              transition={{ duration: 0.25 }}
+            >
+              {/* Browser bar */}
+              <div className="browser-bar">
+                <div className="browser-dot" style={{ background: "#FF5F57" }} />
+                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+                <div className="browser-dot" style={{ background: "#28C840" }} />
+                <div className="browser-url">
+                  <span style={{ color: "#4EC9B0" }}>http://</span>
+                  <span style={{ color: "#D4D4D4" }}>{p.url}</span>
                 </div>
+                <span style={{
+                  fontFamily: "'Fira Code', monospace", fontSize: 10,
+                  color: p.color, background: `${p.color}12`,
+                  border: `1px solid ${p.color}25`, borderRadius: 3,
+                  padding: "2px 8px", flexShrink: 0,
+                }}>
+                  {p.type}
+                </span>
               </div>
 
-              {/* Info */}
-              <div className="p-7 flex flex-col justify-between border-l border-white/5">
-                <div>
-                  {/* Index + type */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-mono-code text-4xl font-bold opacity-10 text-offwhite">{p.index}</span>
-                    <span className="px-3 py-1 rounded-full text-[11px] font-inter"
-                      style={{ background: `${p.accent}12`, color: p.accent, border: `1px solid ${p.accent}25` }}>
-                      {p.type}
-                    </span>
+              {/* Content */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+                {/* Left: image + tech */}
+                <div style={{ padding: 20, borderRight: "1px solid #3E3E42" }}>
+                  <ImageCarousel images={p.images} color={p.color} />
+
+                  {/* Tech tags */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
+                    {p.tech.map(t => (
+                      <span key={t} className="skill-tag"
+                        style={{ borderColor: `${p.color}25`, color: p.color, background: `${p.color}08` }}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: info */}
+                <div style={{ padding: 20, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    {/* Index + period */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 32, fontWeight: 700, color: "#3E3E42" }}>
+                        {p.index}
+                      </span>
+                      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585" }}>{p.period}</span>
+                    </div>
+
+                    {/* Title as code */}
+                    <div style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#6A9955", marginBottom: 4 }}>
+                      {"// "}{p.subtitle}
+                    </div>
+                    <h3 style={{ fontFamily: "'Fira Code', monospace", fontSize: 16, fontWeight: 600, color: "#D4D4D4", marginBottom: 4 }}>
+                      <span style={{ color: "#DCDCAA" }}>{p.title}</span>
+                    </h3>
+                    <div style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: p.color, marginBottom: 12 }}>
+                      {p.file}
+                    </div>
+
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#858585", lineHeight: 1.7, marginBottom: 14 }}>
+                      {p.description}
+                    </p>
+
+                    {/* Highlights */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 16 }}>
+                      {p.highlights.map((h, j) => (
+                        <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                          <CheckCircle2 size={11} style={{ color: p.color, flexShrink: 0, marginTop: 2 }} />
+                          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#858585" }}>{h}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <span className="text-[11px] text-muted font-inter">{p.period}</span>
-                  <h3 className="font-grotesk font-bold text-xl text-offwhite mt-1 mb-1">{p.title}</h3>
-                  <p className="text-sm font-inter mb-3" style={{ color: p.accent }}>{p.subtitle}</p>
-                  <p className="text-muted text-xs font-inter leading-relaxed mb-5">{p.description}</p>
-
-                  {/* Highlights */}
-                  <ul className="space-y-2 mb-6">
-                    {p.highlights.map((h, j) => (
-                      <li key={j} className="flex items-start gap-2 text-xs font-inter text-muted">
-                        <CheckCircle2 size={12} className="shrink-0 mt-0.5" style={{ color: p.accent }} />
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Links */}
-                <div className="flex gap-3">
-                  <a href={p.github} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 glass rounded-full text-xs font-inter text-muted hover:text-offwhite hover:border-white/20 transition-all">
-                    <Github size={12} /> GitHub
-                  </a>
-                  {p.live && (
-                    <a href={p.live} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-inter transition-all hover:opacity-90"
-                      style={{ background: `${p.accent}15`, border: `1px solid ${p.accent}30`, color: p.accent }}>
-                      <ExternalLink size={12} /> Live Demo
+                  {/* Links */}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <a href={p.github} target="_blank" rel="noopener noreferrer"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 5,
+                        padding: "6px 14px", borderRadius: 4,
+                        background: "#2D2D30", border: "1px solid #3E3E42",
+                        fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#858585",
+                        textDecoration: "none", transition: "all 0.2s",
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
+                    >
+                      <Github size={11} /> github
                     </a>
-                  )}
+                    {p.live && (
+                      <a href={p.live} target="_blank" rel="noopener noreferrer"
+                        style={{
+                          display: "flex", alignItems: "center", gap: 5,
+                          padding: "6px 14px", borderRadius: 4,
+                          background: `${p.color}12`, border: `1px solid ${p.color}30`,
+                          fontFamily: "'Fira Code', monospace", fontSize: 11, color: p.color,
+                          textDecoration: "none", transition: "all 0.2s",
+                        }}>
+                        <ExternalLink size={11} /> live_demo
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         ))}
       </div>

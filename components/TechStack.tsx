@@ -1,69 +1,114 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { Server, Globe, Smartphone, Database, TestTube2, Wrench, Zap } from "lucide-react";
 
-const CATS = [
+const IMPORTS = [
   {
-    label: "Backend", icon: Server, accent: "#ff2d20", desc: "Server-side logic & APIs",
-    skills: [
-      { name: "PHP",     glow: "skill-glow-php",    dot: "#777bb4" },
-      { name: "Laravel", glow: "skill-glow-laravel", dot: "#ff2d20" },
-      { name: "Python",  glow: "skill-glow-python",  dot: "#3776ab" },
+    from: "backend",
+    color: "#CE9178",
+    items: [
+      { name: "PHP",     color: "#777BB4" },
+      { name: "Laravel", color: "#FF2D20" },
+      { name: "Python",  color: "#3776AB" },
     ],
   },
   {
-    label: "Frontend", icon: Globe, accent: "#0ea5e9", desc: "UI/UX & web interfaces",
-    skills: [
-      { name: "HTML/CSS/JS",  glow: "skill-glow-default",  dot: "#f7df1e" },
-      { name: "TypeScript",   glow: "skill-glow-ts",        dot: "#3178c6" },
-      { name: "React",        glow: "skill-glow-react",     dot: "#61dafb" },
-      { name: "Next.js",      glow: "skill-glow-next",      dot: "#ffffff" },
-      { name: "Tailwind CSS", glow: "skill-glow-tailwind",  dot: "#06b6d4" },
-      { name: "Bootstrap",    glow: "skill-glow-default",   dot: "#7952b3" },
+    from: "frontend",
+    color: "#CE9178",
+    items: [
+      { name: "TypeScript",   color: "#3178C6" },
+      { name: "React",        color: "#61DAFB" },
+      { name: "Next.js",      color: "#D4D4D4" },
+      { name: "Tailwind CSS", color: "#06B6D4" },
+      { name: "HTML/CSS/JS",  color: "#F7DF1E" },
     ],
   },
   {
-    label: "Mobile", icon: Smartphone, accent: "#54b6f6", desc: "Cross-platform apps",
-    skills: [
-      { name: "Flutter", glow: "skill-glow-flutter", dot: "#54b6f6" },
-      { name: "Dart",    glow: "skill-glow-dart",    dot: "#00b4ab" },
+    from: "mobile",
+    color: "#CE9178",
+    items: [
+      { name: "Flutter", color: "#54B6F6" },
+      { name: "Dart",    color: "#00B4AB" },
     ],
   },
   {
-    label: "Database", icon: Database, accent: "#336791", desc: "Data storage & design",
-    skills: [
-      { name: "PostgreSQL", glow: "skill-glow-postgres", dot: "#336791" },
-      { name: "MySQL",      glow: "skill-glow-mysql",    dot: "#00758f" },
+    from: "database",
+    color: "#CE9178",
+    items: [
+      { name: "MySQL",      color: "#00758F" },
+      { name: "PostgreSQL", color: "#336791" },
     ],
   },
   {
-    label: "QA & Testing", icon: TestTube2, accent: "#22c55e", desc: "Quality assurance & automation",
+    from: "qa_testing",
+    color: "#CE9178",
     featured: true,
-    skills: [
-      { name: "Cypress",            glow: "skill-glow-cypress", dot: "#69db7c" },
-      { name: "Manual Testing",     glow: "skill-glow-cypress", dot: "#22c55e" },
-      { name: "Automated Testing",  glow: "skill-glow-cypress", dot: "#4ade80" },
-      { name: "Test Case Design",   glow: "skill-glow-cypress", dot: "#86efac" },
-      { name: "Data Migration",     glow: "skill-glow-cypress", dot: "#bbf7d0" },
+    items: [
+      { name: "Cypress",           color: "#69DB7C" },
+      { name: "Manual Testing",    color: "#22C55E" },
+      { name: "Test Case Design",  color: "#4ADE80" },
+      { name: "Data Migration",    color: "#86EFAC" },
+      { name: "Role-Based Testing",color: "#BBF7D0" },
     ],
   },
   {
-    label: "Tools", icon: Wrench, accent: "#f05032", desc: "Dev environment & workflow",
-    skills: [
-      { name: "Git",      glow: "skill-glow-git",     dot: "#f05032" },
-      { name: "VS Code",  glow: "skill-glow-default",  dot: "#007acc" },
-      { name: "Passbolt", glow: "skill-glow-default",  dot: "#cf2a27" },
+    from: "tools",
+    color: "#CE9178",
+    items: [
+      { name: "Git",      color: "#F05032" },
+      { name: "VS Code",  color: "#007ACC" },
+      { name: "Passbolt", color: "#CF2A27" },
+      { name: "GitHub",   color: "#D4D4D4" },
     ],
   },
 ];
 
-const container = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
-const item = {
-  hidden: { opacity: 0, y: 24, scale: 0.97 },
-  show:   { opacity: 1, y: 0,  scale: 1,    transition: { duration: 0.5, ease: [0.22,1,0.36,1] as number[] } },
-};
+function SkillChip({ name, color }: { name: string; color: string }) {
+  const [compiling, setCompiling] = useState(false);
+
+  return (
+    <motion.div
+      onHoverStart={() => setCompiling(true)}
+      onHoverEnd={() => setCompiling(false)}
+      whileHover={{ y: -2 }}
+      style={{
+        position: "relative",
+        display: "inline-flex", flexDirection: "column",
+        padding: "6px 12px",
+        background: "#2D2D30", border: "1px solid #3E3E42",
+        borderRadius: 4, overflow: "hidden",
+        fontFamily: "'Fira Code', monospace", fontSize: 11,
+        color: compiling ? color : "#858585",
+        transition: "color 0.2s, border-color 0.2s",
+        borderColor: compiling ? `${color}50` : "#3E3E42",
+        cursor: "default",
+      }}
+    >
+      <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0, opacity: compiling ? 1 : 0.4 }} />
+        {name}
+      </span>
+      {/* Compile bar */}
+      {compiling && (
+        <motion.div
+          style={{
+            position: "absolute", bottom: 0, left: 0,
+            height: 2, background: `linear-gradient(90deg,${color},${color}60)`,
+          }}
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        />
+      )}
+    </motion.div>
+  );
+}
+
+const up = (d = 0) => ({
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, delay: d, ease: [0.22, 1, 0.36, 1] as number[] } },
+});
 
 export default function TechStack() {
   const ref = useRef(null);
@@ -72,68 +117,73 @@ export default function TechStack() {
   return (
     <section id="stack" ref={ref} className="section-wrap">
       <p className="section-label">Arsenal</p>
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-10">
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.05 }} className="section-title" style={{ marginBottom: 0 }}>
-          Tech <span className="gradient-text-nautical">Stack</span>
-        </motion.h2>
-        <motion.p initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.12 }}
-          className="text-sm font-inter" style={{ color: "#64748b" }}>
-          Technologies I use to build, test, and ship.
-        </motion.p>
-      </div>
+      <motion.h2 variants={up(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
+        <span style={{ color: "#C586C0" }}>import </span>
+        <span style={{ color: "#4EC9B0" }}>TechStack</span>
+        <span style={{ color: "#C586C0" }}> from </span>
+        <span style={{ color: "#CE9178" }}>&quot;./skills&quot;</span>
+      </motion.h2>
 
-      <motion.div variants={container} initial="hidden" animate={inView ? "show" : "hidden"}
-        className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {CATS.map((cat) => {
-          const Icon = cat.icon;
-          return (
-            <motion.div key={cat.label} variants={item}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className={`glass glass-hover rounded-2xl p-6 flex flex-col gap-4 group ${cat.featured ? "lg:col-span-2" : ""}`}
-              style={{ borderColor: `${cat.accent}10` }}>
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-                    style={{ background: `${cat.accent}12`, border: `1px solid ${cat.accent}25` }}>
-                    <Icon size={16} style={{ color: cat.accent }} />
-                  </div>
-                  <div>
-                    <p className="font-grotesk font-semibold text-sm" style={{ color: "#f1f5f9" }}>{cat.label}</p>
-                    <p className="text-[11px] font-inter" style={{ color: "#64748b" }}>{cat.desc}</p>
-                  </div>
+      <div className="ide-window">
+        <div className="ide-titlebar">
+          <div className="flex items-center gap-1.5 px-3">
+            <div className="browser-dot" style={{ background: "#FF5F57" }} />
+            <div className="browser-dot" style={{ background: "#FEBC2E" }} />
+            <div className="browser-dot" style={{ background: "#28C840" }} />
+          </div>
+          <div className="ide-tab active">
+            <div className="ide-tab-dot" style={{ background: "#C586C0" }} />
+            tech_stack.ts
+          </div>
+        </div>
+
+        <div className="ide-code-area">
+          <div className="ide-line-numbers">
+            {Array.from({ length: IMPORTS.length + 4 }, (_, i) => <span key={i}>{i + 1}</span>)}
+          </div>
+          <div className="ide-body flex-1" style={{ fontSize: 12 }}>
+            <div style={{ color: "#6A9955", marginBottom: 12 }}>{"// Technologies I use to build, test, and ship."}</div>
+
+            {IMPORTS.map((group, i) => (
+              <motion.div key={group.from}
+                variants={up(0.1 + i * 0.07)}
+                initial="hidden"
+                animate={inView ? "show" : "hidden"}
+                style={{ marginBottom: 14 }}
+              >
+                {/* Import statement line */}
+                <div style={{ marginBottom: 8, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
+                  <span style={{ color: "#C586C0" }}>import </span>
+                  <span style={{ color: "#808080" }}>{"{ "}</span>
+                  {group.items.map((item, j) => (
+                    <span key={item.name}>
+                      <span style={{ color: "#9CDCFE" }}>{item.name.replace(/[^a-zA-Z]/g, "")}</span>
+                      {j < group.items.length - 1 && <span style={{ color: "#808080" }}>, </span>}
+                    </span>
+                  ))}
+                  <span style={{ color: "#808080" }}>{" }"}</span>
+                  <span style={{ color: "#C586C0" }}> from </span>
+                  <span style={{ color: "#CE9178" }}>&quot;{group.from}&quot;</span>
+                  <span style={{ color: "#808080" }}>;</span>
+                  {group.featured && <span style={{ color: "#6A9955", marginLeft: 8 }}>{"// ★ primary specialization"}</span>}
                 </div>
-                <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full"
-                  style={{ background: `${cat.accent}10`, color: cat.accent, border: `1px solid ${cat.accent}18` }}>
-                  {cat.skills.length}
-                </span>
-              </div>
 
-              <div style={{ height: 1, background: `linear-gradient(90deg,${cat.accent}25,transparent)` }} />
-
-              {/* Skills */}
-              <div className="flex flex-wrap gap-2">
-                {cat.skills.map(s => (
-                  <span key={s.name} className={`skill-tag ${s.glow}`}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot, flexShrink: 0 }} />
-                    {s.name}
-                  </span>
-                ))}
-              </div>
-
-              {cat.featured && (
-                <div className="flex items-center gap-1.5 text-[11px] font-inter mt-auto"
-                  style={{ color: cat.accent }}>
-                  <Zap size={10} /> Primary specialization — 486h professional OJT
+                {/* Skill chips */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, paddingLeft: 16 }}>
+                  {group.items.map(item => (
+                    <SkillChip key={item.name} name={item.name} color={item.color} />
+                  ))}
                 </div>
-              )}
+              </motion.div>
+            ))}
+
+            <motion.div variants={up(0.6)} initial="hidden" animate={inView ? "show" : "hidden"}
+              style={{ marginTop: 8, color: "#6A9955" }}>
+              {"// 486h professional QA OJT — Wela Online Corporation, DCMU"}
             </motion.div>
-          );
-        })}
-      </motion.div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
