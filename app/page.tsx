@@ -15,6 +15,7 @@ const ProjectsSection  = dynamic(() => import("@/components/ProjectsSection"),  
 const CertsSection     = dynamic(() => import("@/components/CertsSection"),     { ssr: false });
 const ContactSection   = dynamic(() => import("@/components/ContactSection"),   { ssr: false });
 const Footer           = dynamic(() => import("@/components/Footer"),           { ssr: false });
+const AiChat           = dynamic(() => import("@/components/AiChat"),           { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -75,6 +76,7 @@ export default function Home() {
         <ContactSection />
         <Footer />
       </main>
+      <AiChat />
     </>
   );
 }

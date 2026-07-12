@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Github, Linkedin, Facebook, Instagram, ArrowUp, Heart, GitBranch, Wifi } from "lucide-react";
+import VsCodePet from "@/components/VsCodePet";
 
 const SOCIALS = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -126,6 +127,7 @@ export default function Footer() {
             <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
               ✓ 0 errors, 0 warnings
             </span>
+            <VsCodePet />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
