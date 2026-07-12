@@ -16,7 +16,8 @@ const CertsSection     = dynamic(() => import("@/components/CertsSection"),     
 const ContactSection   = dynamic(() => import("@/components/ContactSection"),   { ssr: false });
 const Footer           = dynamic(() => import("@/components/Footer"),           { ssr: false });
 const AiChat           = dynamic(() => import("@/components/AiChat"),           { ssr: false });
-const VsCodePet        = dynamic(() => import("@/components/VsCodePet"),        { ssr: false });
+const CursorTrail      = dynamic(() => import("@/components/CursorTrail"),      { ssr: false });
+const TerminalGhost    = dynamic(() => import("@/components/TerminalGhost"),    { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -78,7 +79,8 @@ export default function Home() {
         <Footer />
       </main>
       <AiChat />
-      <VsCodePet />
+      <CursorTrail />
+      <TerminalGhost />
     </>
   );
 }
