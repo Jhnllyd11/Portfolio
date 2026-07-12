@@ -1,52 +1,39 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, Eye, ArrowRight, Terminal } from "lucide-react";
+import { useTypewriter, type TerminalMessage } from "@/hooks/useTypewriter";
 
 const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation", "Next.js Developer"];
 const CV = "/images/CV/CV Resume.png";
 
-type RawTerminalLine =
-  | { type: "cmd"; prompt: string; cmd: string }
-  | { type: "output"; text: string; color: string }
-  | { type: "cursor"; prompt: string };
-
-type TerminalLine =
-  | { type: "cmd"; prompt: string; cmd: string; startDelay: number }
-  | { type: "output"; text: string; color: string; startDelay: number }
-  | { type: "cursor"; prompt: string; startDelay: number };
-
-const CHAR_SPEED = 38; // ms per character
-
-function calcDelay(lines: RawTerminalLine[], idx: number): number {
-  let t = 0;
-  for (let i = 0; i < idx; i++) {
-    const l = lines[i] as TerminalLine;
-    if (l.type === "cmd") t += 300 + l.cmd.length * CHAR_SPEED;
-    else if (l.type === "output") t += 80 + l.text.length * (CHAR_SPEED * 0.6);
-    else t += 200;
-  }
-  return t;
-}
-
-const RAW_LINES: RawTerminalLine[] = [
-  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " whoami" },
-  { type: "output", text: "jhon-lloyd-samson", color: "#4EC9B0" },
-  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " cat skills.txt" },
-  { type: "output", text: "→ PHP · Laravel · Next.js · TypeScript", color: "#9CDCFE" },
-  { type: "output", text: "→ Cypress · Manual Testing · Test Design", color: "#22C55E" },
-  { type: "output", text: "→ MySQL · Flutter · Git · VS Code", color: "#CE9178" },
-  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " echo $STATUS" },
-  { type: "output", text: "✓ open_to_work=true | qa_certified=true", color: "#22C55E" },
-  { type: "cursor", prompt: "user@portfolio:~$" },
+const TERMINAL_DATA: TerminalMessage[] = [
+  { type: "cmd",     prompt: "user@portfolio:~$", text: "whoami" },
+  { type: "output",  text: "jhon-lloyd-samson" },
+  { type: "cmd",     prompt: "user@portfolio:~$", text: "cat skills.txt" },
+  { type: "info",    text: "→ PHP · Laravel · Next.js · TypeScript" },
+  { type: "success", text: "→ Cypress · Manual Testing · Test Design" },
+  { type: "output",  text: "→ MySQL · Flutter · Git · VS Code" },
+  { type: "cmd",     prompt: "user@portfolio:~$", text: "npx cypress run --spec qa.cy.ts" },
+  { type: "info",    text: "  Running 6 test suites..." },
+  { type: "success", text: "✓ Login Flow — PO / PM / Dev / QA  (312ms)" },
+  { type: "success", text: "✓ Sprint Cycle Creation             (487ms)" },
+  { type: "success", text: "✓ Role-Based Access Validation      (391ms)" },
+  { type: "success", text: "✓ 6 passing  |  0 failing" },
+  { type: "cmd",     prompt: "user@portfolio:~$", text: "echo $STATUS" },
+  { type: "success", text: "✓ open_to_work=true | qa_certified=true" },
 ];
 
-const TERMINAL_LINES: TerminalLine[] = RAW_LINES.map((l, i) => ({
-  ...l,
-  startDelay: calcDelay(RAW_LINES, i),
-} as TerminalLine));
+/** Map line type → color token */
+const LINE_COLOR: Record<string, string> = {
+  cmd:     "#D4D4D4",
+  output:  "#4EC9B0",
+  info:    "#9CDCFE",
+  success: "#22C55E",
+  error:   "#F44747",
+};
 
 const socials = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -93,71 +80,86 @@ function SyntaxName() {
   );
 }
 
-function useTypingLine(text: string, startDelay: number, charSpeed = CHAR_SPEED) {
-  const [displayed, setDisplayed] = useState("");
-  useEffect(() => {
-    let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    timers.push(setTimeout(() => {
-      for (let i = 1; i <= text.length; i++) {
-        timers.push(setTimeout(() => {
-          if (!cancelled) setDisplayed(text.slice(0, i));
-        }, (i - 1) * charSpeed));
-      }
-    }, startDelay));
-    return () => { cancelled = true; timers.forEach(clearTimeout); };
-  }, [text, startDelay, charSpeed]);
-  return displayed;
-}
-
-function CmdLine({ line }: { line: Extract<TerminalLine, { type: "cmd" }> }) {
-  const typed = useTypingLine(line.cmd, line.startDelay);
-  const done = typed.length === line.cmd.length;
-  return (
-    <div style={{ display: "flex", alignItems: "center", marginBottom: 3, flexWrap: "wrap" }}>
-      <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
-      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#D4D4D4" }}>{typed}</span>
-      {!done && <span className="terminal-cursor" style={{ marginLeft: 2 }} />}
-    </div>
-  );
-}
-
-function OutputLine({ line }: { line: Extract<TerminalLine, { type: "output" }> }) {
-  const typed = useTypingLine(line.text, line.startDelay, CHAR_SPEED * 0.6);
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: typed.length > 0 ? 1 : 0 }}
-      style={{ marginBottom: 3, paddingLeft: 4 }}
-    >
-      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: line.color }}>{typed}</span>
-    </motion.div>
-  );
-}
-
 function TerminalTyping() {
+  const { lines, activeIndex, isFinished, reset } = useTypewriter(TERMINAL_DATA, 28, 120);
+
   return (
-    <div className="terminal" style={{ height: "100%", minHeight: 280 }}>
+    <div className="terminal" style={{ height: "100%", minHeight: 320 }}>
+      {/* Title bar */}
       <div className="terminal-bar">
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57" }} />
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E" }} />
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28C840" }} />
+        <button
+          onClick={reset}
+          title="Replay"
+          style={{
+            width: 10, height: 10, borderRadius: "50%", background: "#28C840",
+            border: "none", cursor: "pointer", padding: 0,
+          }}
+        />
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginLeft: 8 }}>
           <Terminal size={10} style={{ color: "#858585" }} />
           <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585" }}>bash — portfolio</span>
         </div>
       </div>
-      <div className="terminal-body" style={{ padding: "14px 18px" }}>
-        {TERMINAL_LINES.map((line, i) => {
-          if (line.type === "cmd") return <CmdLine key={i} line={line} />;
-          if (line.type === "output") return <OutputLine key={i} line={line} />;
+
+      {/* Body */}
+      <div className="terminal-body" style={{ padding: "14px 18px", overflowY: "auto", maxHeight: 380 }}>
+        {TERMINAL_DATA.map((msg, i) => {
+          const displayed = lines[i] ?? "";
+          if (!displayed && i > (activeIndex === -1 ? -1 : activeIndex)) return null;
+
+          const isActive  = i === activeIndex;
+          const color     = LINE_COLOR[msg.type] ?? "#D4D4D4";
+          const isCmd     = msg.type === "cmd";
+
           return (
-            <div key={i} style={{ display: "flex", alignItems: "center", marginBottom: 3 }}>
-              <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
-              <span className="terminal-cursor" style={{ marginLeft: 6 }} />
-            </div>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+              style={{ display: "flex", alignItems: "center", marginBottom: 3, flexWrap: "wrap", gap: 0 }}
+            >
+              {isCmd && (
+                <span className="terminal-prompt" style={{ fontSize: 12, marginRight: 6 }}>
+                  {msg.prompt}
+                </span>
+              )}
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color, paddingLeft: isCmd ? 0 : 4 }}>
+                {displayed}
+              </span>
+              {/* blinking cursor on the active line */}
+              {isActive && (
+                <motion.span
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                  style={{
+                    display: "inline-block", width: 7, height: 13,
+                    background: "#569CD6", marginLeft: 2, verticalAlign: "middle",
+                  }}
+                />
+              )}
+            </motion.div>
           );
         })}
+
+        {/* idle cursor after all lines finish */}
+        {isFinished && (
+          <div style={{ display: "flex", alignItems: "center", marginTop: 3 }}>
+            <span className="terminal-prompt" style={{ fontSize: 12, marginRight: 6 }}>
+              user@portfolio:~$
+            </span>
+            <motion.span
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              style={{
+                display: "inline-block", width: 7, height: 13,
+                background: "#569CD6", verticalAlign: "middle",
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
