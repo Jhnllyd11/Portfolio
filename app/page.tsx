@@ -17,7 +17,7 @@ const ContactSection   = dynamic(() => import("@/components/ContactSection"),   
 const Footer           = dynamic(() => import("@/components/Footer"),           { ssr: false });
 const AiChat           = dynamic(() => import("@/components/AiChat"),           { ssr: false });
 const CursorTrail      = dynamic(() => import("@/components/CursorTrail"),      { ssr: false });
-const TerminalGhost    = dynamic(() => import("@/components/TerminalGhost"),    { ssr: false });
+const ActivityFeed     = dynamic(() => import("@/components/ActivityFeed"),     { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,7 @@ export default function Home() {
       </main>
       <AiChat />
       <CursorTrail />
-      <TerminalGhost />
+      <ActivityFeed />
     </>
   );
 }
