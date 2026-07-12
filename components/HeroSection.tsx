@@ -8,6 +8,11 @@ import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, E
 const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation", "Next.js Developer"];
 const CV = "/images/CV/CV Resume.png";
 
+type RawTerminalLine =
+  | { type: "cmd"; prompt: string; cmd: string }
+  | { type: "output"; text: string; color: string }
+  | { type: "cursor"; prompt: string };
+
 type TerminalLine =
   | { type: "cmd"; prompt: string; cmd: string; startDelay: number }
   | { type: "output"; text: string; color: string; startDelay: number }
@@ -15,7 +20,7 @@ type TerminalLine =
 
 const CHAR_SPEED = 38; // ms per character
 
-function calcDelay(lines: Omit<TerminalLine, "startDelay">[], idx: number): number {
+function calcDelay(lines: RawTerminalLine[], idx: number): number {
   let t = 0;
   for (let i = 0; i < idx; i++) {
     const l = lines[i] as TerminalLine;
@@ -26,7 +31,7 @@ function calcDelay(lines: Omit<TerminalLine, "startDelay">[], idx: number): numb
   return t;
 }
 
-const RAW_LINES: Omit<TerminalLine, "startDelay">[] = [
+const RAW_LINES: RawTerminalLine[] = [
   { type: "cmd",    prompt: "user@portfolio:~$", cmd: " whoami" },
   { type: "output", text: "jhon-lloyd-samson", color: "#4EC9B0" },
   { type: "cmd",    prompt: "user@portfolio:~$", cmd: " cat skills.txt" },
