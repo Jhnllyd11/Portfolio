@@ -24,6 +24,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
   const [active, setActive]     = useState("about");
+  const [clicking, setClicking] = useState<string | null>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
@@ -81,12 +82,13 @@ export default function Navbar() {
           <span style={{ color: "#CE9178" }}>portfolio</span>
         </a>
 
-        {/* Nav tabs */}
-        <nav className="hidden md:flex" style={{ alignItems: "stretch" }}>
+        {/* Nav tabs — horizontally scrollable on smaller screens */}
+        <nav className="hidden md:flex" style={{ alignItems: "stretch", overflowX: "auto", scrollbarWidth: "none" }}>
           {NAV.map(({ label, href, dot, id }) => {
-            const isActive = active === id || (id === "about" && active === "about");
+            const isActive = (clicking ?? active) === id;
             return (
               <a key={label} href={href}
+                onClick={() => { setClicking(id); setTimeout(() => setClicking(null), 800); }}
                 style={{
                   position: "relative",
                   display: "flex", alignItems: "center", gap: 6,

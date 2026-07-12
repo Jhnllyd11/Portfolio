@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Github, Linkedin, Facebook, Instagram, ArrowUp, Heart, GitBranch, Wifi } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Github, Linkedin, Facebook, Instagram, ArrowUp, Heart, GitBranch, Wifi, ChevronUp, ChevronDown, CheckCircle2, Clock } from "lucide-react";
 import VsCodePet from "@/components/VsCodePet";
 
 const SOCIALS = [
@@ -18,6 +19,146 @@ const LINKS = [
   { label: "certs.ts",    href: "#certs" },
   { label: "contact.ts",  href: "#contact" },
 ];
+
+const QA_TESTS = [
+  { label: "Login Flow — PO / PM / Dev / QA roles",       ms: 312  },
+  { label: "Sprint Cycle Creation",                        ms: 487  },
+  { label: "Product Backlog Management",                   ms: 203  },
+  { label: "Role-Based Access Validation",                 ms: 391  },
+  { label: "Data Migration Integrity Check",               ms: 558  },
+  { label: "Intern Timesheet Submission",                  ms: 174  },
+];
+
+function QAPanel() {
+  const [open, setOpen] = useState(false);
+  const [ran, setRan]   = useState(false);
+  const [done, setDone] = useState(0);
+
+  function runTests() {
+    setRan(true);
+    setDone(0);
+    QA_TESTS.forEach((_, i) => {
+      setTimeout(() => setDone(i + 1), 400 + i * 520);
+    });
+  }
+
+  return (
+    <div style={{ borderTop: "1px solid #3E3E42" }}>
+      {/* Panel header — always visible */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 8,
+          padding: "6px 16px", background: "#2D2D30", border: "none",
+          borderBottom: open ? "1px solid #3E3E42" : "none",
+          fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#858585",
+          cursor: "pointer", transition: "background 0.15s",
+        }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#333337"; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#2D2D30"; }}
+      >
+        {open ? <ChevronDown size={11} /> : <ChevronUp size={11} />}
+        <span style={{ color: "#22C55E" }}>TERMINAL</span>
+        <span style={{ color: "#3E3E42" }}>|</span>
+        <span>TEST RUNNER</span>
+        <span style={{ color: "#3E3E42" }}>|</span>
+        <span>OUTPUT</span>
+        <div style={{ flex: 1 }} />
+        {ran && (
+          <span style={{ color: done === QA_TESTS.length ? "#22C55E" : "#F59E0B", fontSize: 10 }}>
+            {done}/{QA_TESTS.length} passed
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="qa-panel"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            style={{ overflow: "hidden", background: "#1E1E1E" }}
+          >
+            <div style={{ padding: "12px 16px" }}>
+              {/* Run button */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <button
+                  onClick={runTests}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 5,
+                    padding: "4px 14px", borderRadius: 4,
+                    background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.35)",
+                    fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#22C55E",
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(34,197,94,0.2)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(34,197,94,0.1)"; }}
+                >
+                  ▶ Run All Tests
+                </button>
+                {ran && done < QA_TESTS.length && (
+                  <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#F59E0B" }}>
+                    Running...
+                  </span>
+                )}
+                {ran && done === QA_TESTS.length && (
+                  <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#22C55E" }}>
+                    ✓ All tests passed
+                  </span>
+                )}
+              </div>
+
+              {/* Test list */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                {QA_TESTS.map((t, i) => {
+                  const passed = ran && done > i;
+                  const running = ran && done === i;
+                  return (
+                    <motion.div
+                      key={i}
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                      animate={passed ? { x: [4, 0] } : {}}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {passed ? (
+                        <motion.div
+                          initial={{ scale: 0 }} animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        >
+                          <CheckCircle2 size={12} style={{ color: "#22C55E", flexShrink: 0 }} />
+                        </motion.div>
+                      ) : running ? (
+                        <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}>
+                          <Clock size={12} style={{ color: "#F59E0B", flexShrink: 0 }} />
+                        </motion.div>
+                      ) : (
+                        <div style={{ width: 12, height: 12, borderRadius: "50%", border: "1px solid #3E3E42", flexShrink: 0 }} />
+                      )}
+                      <span style={{
+                        fontFamily: "'Fira Code', monospace", fontSize: 11,
+                        color: passed ? "#D4D4D4" : "#555",
+                        transition: "color 0.3s",
+                      }}>
+                        {t.label}
+                      </span>
+                      {passed && (
+                        <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#3E3E42", marginLeft: "auto" }}>
+                          {t.ms}ms
+                        </span>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Footer() {
   return (
@@ -113,6 +254,9 @@ export default function Footer() {
             </motion.button>
           </div>
         </div>
+
+        {/* QA Test Runner Panel */}
+        <QAPanel />
 
         {/* IDE Status Bar */}
         <div style={{

@@ -499,3 +499,31 @@ body {
 .ide-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
 .ide-scroll::-webkit-scrollbar-track { background: #1E1E1E; }
 .ide-scroll::-webkit-scrollbar-thumb { background: #3E3E42; border-radius: 2px; }
+
+/* ── Mobile responsiveness ────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Terminal: wrap text, no horizontal overflow */
+  .terminal-body {
+    overflow-x: hidden;
+    word-break: break-word;
+  }
+  .terminal-body span {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* IDE windows: prevent overflow */
+  .ide-window, .browser-window {
+    overflow-x: hidden;
+  }
+
+  /* Challenge/solution: stack vertically on mobile */
+  .challenge-solution {
+    grid-template-columns: 1fr;
+  }
+  .cs-arrow {
+    text-align: left;
+    transform: rotate(90deg);
+    display: inline-block;
+  }
+}

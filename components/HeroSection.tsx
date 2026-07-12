@@ -8,17 +8,40 @@ import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, E
 const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation", "Next.js Developer"];
 const CV = "/images/CV/CV Resume.png";
 
-const TERMINAL_LINES = [
-  { prompt: "user@portfolio:~$", cmd: " whoami", delay: 0 },
-  { output: "jhon-lloyd-samson", color: "#4EC9B0", delay: 600 },
-  { prompt: "user@portfolio:~$", cmd: " cat skills.txt", delay: 1200 },
-  { output: "→ PHP · Laravel · Next.js · TypeScript", color: "#9CDCFE", delay: 1800 },
-  { output: "→ Cypress · Manual Testing · Test Design", color: "#22C55E", delay: 2400 },
-  { output: "→ MySQL · Flutter · Git · VS Code", color: "#CE9178", delay: 3000 },
-  { prompt: "user@portfolio:~$", cmd: " echo $STATUS", delay: 3600 },
-  { output: "✓ open_to_work=true | qa_certified=true", color: "#22C55E", delay: 4200 },
-  { prompt: "user@portfolio:~$", cmd: " _", delay: 4800, cursor: true },
+type TerminalLine =
+  | { type: "cmd"; prompt: string; cmd: string; startDelay: number }
+  | { type: "output"; text: string; color: string; startDelay: number }
+  | { type: "cursor"; prompt: string; startDelay: number };
+
+const CHAR_SPEED = 38; // ms per character
+
+function calcDelay(lines: Omit<TerminalLine, "startDelay">[], idx: number): number {
+  let t = 0;
+  for (let i = 0; i < idx; i++) {
+    const l = lines[i] as TerminalLine;
+    if (l.type === "cmd") t += 300 + l.cmd.length * CHAR_SPEED;
+    else if (l.type === "output") t += 80 + l.text.length * (CHAR_SPEED * 0.6);
+    else t += 200;
+  }
+  return t;
+}
+
+const RAW_LINES: Omit<TerminalLine, "startDelay">[] = [
+  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " whoami" },
+  { type: "output", text: "jhon-lloyd-samson", color: "#4EC9B0" },
+  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " cat skills.txt" },
+  { type: "output", text: "→ PHP · Laravel · Next.js · TypeScript", color: "#9CDCFE" },
+  { type: "output", text: "→ Cypress · Manual Testing · Test Design", color: "#22C55E" },
+  { type: "output", text: "→ MySQL · Flutter · Git · VS Code", color: "#CE9178" },
+  { type: "cmd",    prompt: "user@portfolio:~$", cmd: " echo $STATUS" },
+  { type: "output", text: "✓ open_to_work=true | qa_certified=true", color: "#22C55E" },
+  { type: "cursor", prompt: "user@portfolio:~$" },
 ];
+
+const TERMINAL_LINES: TerminalLine[] = RAW_LINES.map((l, i) => ({
+  ...l,
+  startDelay: calcDelay(RAW_LINES, i),
+} as TerminalLine));
 
 const socials = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -65,16 +88,49 @@ function SyntaxName() {
   );
 }
 
-function TerminalTyping() {
-  const [visibleCount, setVisibleCount] = useState(0);
-
+function useTypingLine(text: string, startDelay: number, charSpeed = CHAR_SPEED) {
+  const [displayed, setDisplayed] = useState("");
   useEffect(() => {
-    const timers = TERMINAL_LINES.map((line, i) =>
-      setTimeout(() => setVisibleCount(i + 1), line.delay)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, []);
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    timers.push(setTimeout(() => {
+      for (let i = 1; i <= text.length; i++) {
+        timers.push(setTimeout(() => {
+          if (!cancelled) setDisplayed(text.slice(0, i));
+        }, (i - 1) * charSpeed));
+      }
+    }, startDelay));
+    return () => { cancelled = true; timers.forEach(clearTimeout); };
+  }, [text, startDelay, charSpeed]);
+  return displayed;
+}
 
+function CmdLine({ line }: { line: Extract<TerminalLine, { type: "cmd" }> }) {
+  const typed = useTypingLine(line.cmd, line.startDelay);
+  const done = typed.length === line.cmd.length;
+  return (
+    <div style={{ display: "flex", alignItems: "center", marginBottom: 3, flexWrap: "wrap" }}>
+      <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
+      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#D4D4D4" }}>{typed}</span>
+      {!done && <span className="terminal-cursor" style={{ marginLeft: 2 }} />}
+    </div>
+  );
+}
+
+function OutputLine({ line }: { line: Extract<TerminalLine, { type: "output" }> }) {
+  const typed = useTypingLine(line.text, line.startDelay, CHAR_SPEED * 0.6);
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: typed.length > 0 ? 1 : 0 }}
+      style={{ marginBottom: 3, paddingLeft: 4 }}
+    >
+      <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: line.color }}>{typed}</span>
+    </motion.div>
+  );
+}
+
+function TerminalTyping() {
   return (
     <div className="terminal" style={{ height: "100%", minHeight: 280 }}>
       <div className="terminal-bar">
@@ -87,28 +143,16 @@ function TerminalTyping() {
         </div>
       </div>
       <div className="terminal-body" style={{ padding: "14px 18px" }}>
-        {TERMINAL_LINES.slice(0, visibleCount).map((line, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 3, flexWrap: "wrap" }}
-          >
-            {"prompt" in line && (
-              <>
-                <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
-                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#D4D4D4" }}>{line.cmd}</span>
-                {line.cursor && <span className="terminal-cursor" style={{ marginLeft: 2 }} />}
-              </>
-            )}
-            {"output" in line && (
-              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: line.color, paddingLeft: 4 }}>
-                {line.output}
-              </span>
-            )}
-          </motion.div>
-        ))}
+        {TERMINAL_LINES.map((line, i) => {
+          if (line.type === "cmd") return <CmdLine key={i} line={line} />;
+          if (line.type === "output") return <OutputLine key={i} line={line} />;
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", marginBottom: 3 }}>
+              <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
+              <span className="terminal-cursor" style={{ marginLeft: 6 }} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
