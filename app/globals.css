@@ -7,7 +7,7 @@
 html { scroll-behavior: smooth; }
 body {
   background: #1E1E1E;
-  color: #D4D4D4;
+  color: #C8C8C8;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
 }
@@ -292,20 +292,21 @@ body {
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #6A9955;
+  color: #4EC9B0;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .section-label::before { content: "// "; }
 
 /* ── Section title ────────────────────────────────────────────────────────── */
 .section-title {
-  font-family: 'Fira Code', monospace;
-  font-weight: 600;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  line-height: 1.2;
-  color: #D4D4D4;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  line-height: 1.15;
+  color: #ECECEC;
   margin-bottom: 2.5rem;
+  letter-spacing: -0.02em;
 }
 
 /* ── Input focus glow ─────────────────────────────────────────────────────── */
@@ -321,7 +322,7 @@ body {
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.ide-input::placeholder { color: #4A4A4A; }
+.ide-input::placeholder { color: #555555; }
 .ide-input:focus {
   border-color: #569CD6;
   box-shadow: 0 0 0 2px rgba(86,156,214,0.15), 0 0 12px rgba(86,156,214,0.1);

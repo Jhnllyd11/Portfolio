@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, Layers, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, Layers, CheckCircle2, X, ZoomIn } from "lucide-react";
 
 const projects = [
   {
@@ -61,7 +61,7 @@ const projects = [
   },
 ];
 
-function ImageCarousel({ images, color }: { images: string[]; color: string }) {
+function ImageCarousel({ images, color, onOpen }: { images: string[]; color: string; onOpen?: (i: number) => void }) {
   const [idx, setIdx] = useState(0);
 
   if (!images.length) {
@@ -80,8 +80,9 @@ function ImageCarousel({ images, color }: { images: string[]; color: string }) {
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: 6, overflow: "hidden", background: "#0D0D0D" }}
-      className="group">
+    <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: 6, overflow: "hidden", background: "#0D0D0D", cursor: onOpen ? "zoom-in" : "default" }}
+      className="group"
+      onClick={() => onOpen?.(idx)}>
       <AnimatePresence mode="wait">
         <motion.div key={idx}
           initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
@@ -90,7 +91,7 @@ function ImageCarousel({ images, color }: { images: string[]; color: string }) {
         </motion.div>
       </AnimatePresence>
 
-      <button onClick={() => setIdx(i => (i - 1 + images.length) % images.length)}
+      <button onClick={e => { e.stopPropagation(); setIdx(i => (i - 1 + images.length) % images.length); }}
         style={{
           position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
           width: 28, height: 28, borderRadius: 4, background: "rgba(30,30,30,0.85)",
@@ -100,7 +101,7 @@ function ImageCarousel({ images, color }: { images: string[]; color: string }) {
         className="group-hover:opacity-100">
         <ChevronLeft size={12} />
       </button>
-      <button onClick={() => setIdx(i => (i + 1) % images.length)}
+      <button onClick={e => { e.stopPropagation(); setIdx(i => (i + 1) % images.length); }}
         style={{
           position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
           width: 28, height: 28, borderRadius: 4, background: "rgba(30,30,30,0.85)",
@@ -113,7 +114,7 @@ function ImageCarousel({ images, color }: { images: string[]; color: string }) {
 
       <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 4 }}>
         {images.map((_, i) => (
-          <button key={i} onClick={() => setIdx(i)}
+          <button key={i} onClick={e => { e.stopPropagation(); setIdx(i); }}
             style={{
               height: 3, borderRadius: 99, background: i === idx ? "#D4D4D4" : "rgba(255,255,255,0.25)",
               width: i === idx ? 16 : 6, transition: "all 0.25s", border: "none",
@@ -141,6 +142,7 @@ const fadeUp = (d = 0) => ({
 export default function ProjectsSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [lightbox, setLightbox] = useState<{ images: string[]; idx: number } | null>(null);
 
   return (
     <section id="projects" ref={ref} className="section-wrap">
@@ -155,7 +157,7 @@ export default function ProjectsSection() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {projects.map((p, i) => (
-          <motion.div key={i}
+            <motion.div key={i}
             variants={fadeUp(0.1 + i * 0.1)}
             initial="hidden"
             animate={inView ? "show" : "hidden"}
@@ -190,7 +192,7 @@ export default function ProjectsSection() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
                 {/* Left: image + tech */}
                 <div style={{ padding: 20, borderRight: "1px solid #3E3E42" }}>
-                  <ImageCarousel images={p.images} color={p.color} />
+                  <ImageCarousel images={p.images} color={p.color} onOpen={i => p.images.length && setLightbox({ images: p.images, idx: i })} />
 
                   {/* Tech tags */}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
@@ -274,6 +276,48 @@ export default function ProjectsSection() {
           </motion.div>
         ))}
       </div>
+
+      {/* Image Lightbox */}
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "rgba(13,13,13,0.95)", backdropFilter: "blur(16px)" }}
+            onClick={() => setLightbox(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              style={{ position: "relative", maxWidth: 900, width: "100%", maxHeight: "85vh" }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ position: "relative", width: "100%", aspectRatio: "16/9" }}>
+                <Image src={lightbox.images[lightbox.idx]} alt={`Screenshot ${lightbox.idx + 1}`} fill className="object-contain" />
+              </div>
+              {/* Nav */}
+              {lightbox.images.length > 1 && (
+                <>
+                  <button onClick={() => setLightbox(l => l && ({ ...l, idx: (l.idx - 1 + l.images.length) % l.images.length }))}
+                    style={{ position: "absolute", left: -44, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button onClick={() => setLightbox(l => l && ({ ...l, idx: (l.idx + 1) % l.images.length }))}
+                    style={{ position: "absolute", right: -44, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
+              <button onClick={() => setLightbox(null)}
+                style={{ position: "absolute", top: -40, right: 0, background: "none", border: "none", color: "#858585", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontFamily: "'Fira Code', monospace", fontSize: 11 }}>
+                <X size={14} /> close
+              </button>
+              <div style={{ textAlign: "center", marginTop: 10, fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#858585" }}>
+                {lightbox.idx + 1} / {lightbox.images.length}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

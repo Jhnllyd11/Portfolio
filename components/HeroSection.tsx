@@ -15,28 +15,27 @@ const socials = [
   { icon: Instagram, href: "https://www.instagram.com/jqnllyd",                       label: "Instagram" },
 ];
 
+// The ONE place syntax highlighting is used — the hero name block
 function SyntaxName() {
   return (
-    <div style={{ fontFamily: "'Fira Code', monospace", lineHeight: 1.15 }}>
-      <div style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)", fontWeight: 600 }}>
+    <div style={{ fontFamily: "'Fira Code', monospace", lineHeight: 1.2 }}>
+      <div style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)", fontWeight: 600 }}>
         <span style={{ color: "#C586C0" }}>const </span>
         <span style={{ color: "#9CDCFE" }}>developer</span>
-        <span style={{ color: "#808080" }}> = </span>
-        <span style={{ color: "#808080" }}>{"{"}</span>
+        <span style={{ color: "#808080" }}> = &#123;</span>
       </div>
-      <div style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.6rem)", fontWeight: 600, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
-        <span style={{ color: "#9CDCFE" }}>name</span>
-        <span style={{ color: "#808080" }}>: </span>
+      <div style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", fontWeight: 700, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#ECECEC" }}>
+        <span style={{ color: "#9CDCFE", fontWeight: 400, fontSize: "0.6em" }}>name</span>
+        <span style={{ color: "#808080", fontWeight: 400, fontSize: "0.6em" }}>: </span>
         <span style={{ color: "#CE9178" }}>&quot;Jhon Lloyd Samson&quot;</span>
-        <span style={{ color: "#808080" }}>,</span>
       </div>
-      <div style={{ fontSize: "clamp(1rem, 2.5vw, 1.8rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+      <div style={{ fontSize: "clamp(0.9rem, 2vw, 1.3rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#A0A0A0" }}>
         <span style={{ color: "#9CDCFE" }}>location</span>
         <span style={{ color: "#808080" }}>: </span>
         <span style={{ color: "#CE9178" }}>&quot;Davao del Norte, PH&quot;</span>
         <span style={{ color: "#808080" }}>,</span>
       </div>
-      <div style={{ fontSize: "clamp(1rem, 2.5vw, 1.8rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+      <div style={{ fontSize: "clamp(0.9rem, 2vw, 1.3rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
         <span style={{ color: "#9CDCFE" }}>status</span>
         <span style={{ color: "#808080" }}>: </span>
         <span style={{ color: "#CE9178" }}>&quot;</span>
@@ -44,9 +43,8 @@ function SyntaxName() {
         <span style={{ color: "#CE9178" }}>&quot;</span>
         <span style={{ color: "#808080" }}>,</span>
       </div>
-      <div style={{ fontSize: "clamp(2rem, 5vw, 3.6rem)", fontWeight: 600 }}>
-        <span style={{ color: "#808080" }}>{"}"}</span>
-        <span style={{ color: "#808080" }}>;</span>
+      <div style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)", fontWeight: 600 }}>
+        <span style={{ color: "#808080" }}>&#125;;</span>
       </div>
     </div>
   );
@@ -78,14 +76,13 @@ export default function HeroSection() {
         <div className="section-wrap w-full pt-20">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-            {/* Left: Avatar + socials */}
+            {/* Left: Avatar card */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col items-center gap-5 shrink-0"
             >
-              {/* IDE window wrapping avatar */}
               <div className="ide-window" style={{ width: 200 }}>
                 <div className="ide-titlebar">
                   <div className="flex items-center gap-1.5 px-3">
@@ -102,22 +99,16 @@ export default function HeroSection() {
                   <div className="relative" style={{ borderRadius: 6, overflow: "hidden", aspectRatio: "1" }}>
                     <Image src="/images/profile/avatar.jpg" alt="Jhon Lloyd Samson" fill className="object-cover" priority />
                   </div>
-                  {/* Status */}
-                  <div style={{
-                    marginTop: 10, display: "flex", alignItems: "center", gap: 6,
-                    fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955",
-                  }}>
-                    <span style={{ color: "#808080" }}>// </span>
+                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6 }}>
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full" style={{ background: "#22C55E", opacity: 0.75 }} />
                       <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22C55E" }} />
                     </span>
-                    open to work
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#22C55E" }}>Open to work</span>
                   </div>
-                  {/* Location */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#569CD6" }}>
-                    <MapPin size={9} />
-                    Davao del Norte, PH
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
+                    <MapPin size={9} style={{ color: "#569CD6" }} />
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, color: "#858585" }}>Davao del Norte, PH</span>
                   </div>
                 </div>
               </div>
@@ -134,7 +125,7 @@ export default function HeroSection() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   style={{ background: "rgba(30,30,30,0.85)" }}>
                   <Eye size={12} style={{ color: "#569CD6" }} />
-                  <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#D4D4D4" }}>view cv</span>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 9, color: "#D4D4D4" }}>View CV</span>
                 </div>
               </motion.button>
 
@@ -157,36 +148,33 @@ export default function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Right: Syntax hero text */}
+            {/* Right: Content */}
             <div className="flex-1 text-center lg:text-left">
-              {/* Comment header */}
+
+              {/* Role badge */}
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#6A9955", marginBottom: 16 }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "5px 14px", borderRadius: 4, marginBottom: 20,
+                  background: "rgba(86,156,214,0.08)", border: "1px solid rgba(86,156,214,0.25)",
+                }}
               >
-                {"/**"}
-                <br />
-                {" * @author Jhon Lloyd Samson"}
-                <br />
-                {" * @role "}
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#858585" }}>Currently:</span>
                 <motion.span
                   key={roleIdx}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: roleVisible ? 1 : 0 }}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: roleVisible ? 1 : 0, y: roleVisible ? 0 : -4 }}
                   transition={{ duration: 0.25 }}
-                  style={{ color: "#4EC9B0" }}
+                  style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6" }}
                 >
                   {ROLES[roleIdx]}
                 </motion.span>
-                <br />
-                {" * @location Davao del Norte, Philippines"}
-                <br />
-                {" */"}
               </motion.div>
 
-              {/* Main syntax name */}
+              {/* Syntax name — the wow moment */}
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -196,64 +184,64 @@ export default function HeroSection() {
                 <SyntaxName />
               </motion.div>
 
-              {/* Description */}
+              {/* Plain readable description */}
               <motion.p
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#858585", marginTop: 20, maxWidth: 480, lineHeight: 1.7 }}
+                style={{ fontFamily: "Inter, sans-serif", fontSize: 15, color: "#A0A0A0", marginTop: 20, maxWidth: 480, lineHeight: 1.75 }}
               >
-                Building full-stack systems by day, breaking them on purpose by night.
-                {" "}<span style={{ color: "#D4D4D4" }}>486h QA OJT</span> at Wela Online Corporation.
+                I build full-stack web systems and automate quality assurance.{" "}
+                <span style={{ color: "#C8C8C8" }}>486 hours of QA OJT</span> at Wela Online Corporation.
                 Capstone: <span style={{ color: "#4EC9B0" }}>Maritime Licensing System</span>.
               </motion.p>
 
-              {/* CTAs */}
+              {/* CTAs — plain readable buttons */}
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24, justifyContent: "center" }}
+                style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 28, justifyContent: "center" }}
                 className="lg:justify-start"
               >
                 <a href="#projects"
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    padding: "8px 18px", borderRadius: 4,
-                    background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.4)",
-                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6",
+                    padding: "10px 22px", borderRadius: 6,
+                    background: "#569CD6", border: "1px solid #569CD6",
+                    fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13, color: "#1E1E1E",
                     textDecoration: "none", transition: "all 0.2s",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.25)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.15)"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#4A8BC4"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#569CD6"; }}
                 >
-                  viewProjects() <ArrowRight size={12} />
+                  View Projects <ArrowRight size={13} />
                 </a>
                 <a href="#contact"
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    padding: "8px 18px", borderRadius: 4,
+                    padding: "10px 22px", borderRadius: 6,
                     background: "#252526", border: "1px solid #3E3E42",
-                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#858585",
+                    fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13, color: "#C8C8C8",
                     textDecoration: "none", transition: "all 0.2s",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; (e.currentTarget as HTMLElement).style.color = "#ECECEC"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; (e.currentTarget as HTMLElement).style.color = "#C8C8C8"; }}
                 >
-                  contact.send()
+                  Contact Me
                 </a>
                 <button onClick={() => setCvOpen(true)}
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    padding: "8px 18px", borderRadius: 4,
-                    background: "#252526", border: "1px solid #3E3E42",
-                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#858585",
-                    transition: "all 0.2s",
+                    padding: "10px 22px", borderRadius: 6,
+                    background: "transparent", border: "1px solid #3E3E42",
+                    fontFamily: "Inter, sans-serif", fontSize: 13, color: "#858585",
+                    transition: "all 0.2s", cursor: "pointer",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#C8C8C8"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; }}
                 >
-                  <FileText size={12} /> resume.open()
+                  <FileText size={13} /> View Resume
                 </button>
               </motion.div>
 
@@ -262,13 +250,13 @@ export default function HeroSection() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.65 }}
-                style={{ display: "flex", gap: 24, marginTop: 28, paddingTop: 20, borderTop: "1px solid #3E3E42", justifyContent: "center" }}
+                style={{ display: "flex", gap: 32, marginTop: 32, paddingTop: 24, borderTop: "1px solid #3E3E42", justifyContent: "center" }}
                 className="lg:justify-start"
               >
-                {[["4+", "years_dev"], ["486h", "qa_ojt"], ["3+", "certs"]].map(([v, l]) => (
+                {[["4+", "Years Dev"], ["486h", "QA OJT"], ["3+", "Certifications"]].map(([v, l]) => (
                   <div key={l}>
-                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 20, fontWeight: 600, color: "#569CD6" }}>{v}</p>
-                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955", marginTop: 2 }}>// {l}</p>
+                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 22, fontWeight: 700, color: "#569CD6" }}>{v}</p>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#858585", marginTop: 2 }}>{l}</p>
                   </div>
                 ))}
               </motion.div>
@@ -279,7 +267,7 @@ export default function HeroSection() {
         {/* Scroll cue */}
         <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
           animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#3E3E42", letterSpacing: "0.3em" }}>scroll</span>
+          <span style={{ fontFamily: "Inter, sans-serif", fontSize: 9, color: "#555", letterSpacing: "0.3em", textTransform: "uppercase" }}>Scroll</span>
           <div style={{ width: 1, height: 28, background: "linear-gradient(180deg,#569CD6,transparent)" }} />
         </motion.div>
       </section>
@@ -314,16 +302,15 @@ export default function HeroSection() {
                   <a href={CV} download="JhonLloyd_Samson_CV.png"
                     style={{
                       display: "flex", alignItems: "center", gap: 5,
-                      padding: "3px 10px", borderRadius: 3,
+                      padding: "4px 12px", borderRadius: 4,
                       background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.3)",
-                      fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#569CD6",
+                      fontFamily: "Inter, sans-serif", fontSize: 11, color: "#569CD6",
                       textDecoration: "none",
                     }}
                     onClick={e => e.stopPropagation()}>
-                    <Download size={10} /> download
+                    <Download size={10} /> Download
                   </a>
-                  <button onClick={closeCV}
-                    style={{ background: "none", border: "none", color: "#858585", padding: 4 }}>
+                  <button onClick={closeCV} style={{ background: "none", border: "none", color: "#858585", padding: 4, cursor: "pointer" }}>
                     <X size={14} />
                   </button>
                 </div>

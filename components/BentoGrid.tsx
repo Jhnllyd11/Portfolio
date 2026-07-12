@@ -11,7 +11,7 @@ const SKILLS = [
   { name: "GitHub / Version Control",    level: 85, color: "#569CD6" },
   { name: "MySQL / Database Design",     level: 80, color: "#569CD6" },
   { name: "Next.js / React",             level: 78, color: "#61DAFB" },
-  { name: "PHP / Laravel",               level: 75, color: "#FF2D20" },
+  { name: "PHP / Custom MVC",            level: 75, color: "#FF2D20" },
 ];
 
 const COMPS = [
@@ -60,16 +60,11 @@ export default function BentoGrid() {
     <section id="skills" ref={ref} className="section-wrap">
       <p className="section-label">Capabilities</p>
       <motion.h2 variants={up(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
-        <span style={{ color: "#C586C0" }}>interface </span>
-        <span style={{ color: "#4EC9B0" }}>Skills</span>
-        <span style={{ color: "#808080" }}> extends </span>
-        <span style={{ color: "#DCDCAA" }}>Developer</span>
-        <span style={{ color: "#808080" }}> {"{ ... }"}</span>
+        Skills & Proficiency
       </motion.h2>
 
       {/* Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {/* Skill bars */}
         <motion.div variants={up(0.1)} initial="hidden" animate={inView ? "show" : "hidden"} className="md:col-span-2">
           <TiltCard>
             <div className="ide-titlebar">
@@ -83,13 +78,13 @@ export default function BentoGrid() {
                 proficiency.ts
               </div>
             </div>
-            <div className="ide-body" style={{ fontSize: 12 }}>
-              <div style={{ color: "#6A9955", marginBottom: 12 }}>{"// Technical Proficiency — skill_level: number (0–100)"}</div>
+            <div style={{ padding: "16px 20px" }}>
+              <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13, color: "#ECECEC", marginBottom: 16 }}>Technical Proficiency</p>
               {SKILLS.map((s, i) => (
-                <div key={s.name} style={{ marginBottom: 10 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#9CDCFE" }}>{s.name}</span>
-                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: s.color }}>{s.level}</span>
+                <div key={s.name} style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C8C8C8" }}>{s.name}</span>
+                    <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: s.color }}>{s.level}%</span>
                   </div>
                   <div style={{ height: 3, background: "#2D2D30", borderRadius: 99, overflow: "hidden" }}>
                     <motion.div
@@ -105,22 +100,17 @@ export default function BentoGrid() {
           </TiltCard>
         </motion.div>
 
-        {/* Competency cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="md:grid-cols-1">
           {COMPS.map((c, i) => {
             const Icon = c.icon;
             return (
               <motion.div key={i} variants={up(0.15 + i * 0.05)} initial="hidden" animate={inView ? "show" : "hidden"}>
                 <TiltCard>
-                  <div style={{ padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 10, minHeight: 90 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 6,
-                      background: `${c.color}12`, border: `1px solid ${c.color}25`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
+                  <div style={{ padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 8, minHeight: 90 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 6, background: `${c.color}12`, border: `1px solid ${c.color}25`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Icon size={16} style={{ color: c.color }} />
                     </div>
-                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#D4D4D4" }}>{c.label}</p>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 500, color: "#C8C8C8" }}>{c.label}</p>
                   </div>
                 </TiltCard>
               </motion.div>
@@ -131,7 +121,6 @@ export default function BentoGrid() {
 
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Quote */}
         <motion.div variants={up(0.3)} initial="hidden" animate={inView ? "show" : "hidden"}>
           <TiltCard style={{ height: "100%" }}>
             <div className="ide-titlebar">
@@ -145,21 +134,20 @@ export default function BentoGrid() {
                 philosophy.md
               </div>
             </div>
-            <div className="ide-body" style={{ fontSize: 12, display: "flex", flexDirection: "column", gap: 12, height: "calc(100% - 35px)" }}>
+            <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
               <Quote size={18} style={{ color: "rgba(86,156,214,0.3)" }} />
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#D4D4D4", lineHeight: 1.7, fontStyle: "italic", flex: 1 }}>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#C8C8C8", lineHeight: 1.75, fontStyle: "italic" }}>
                 &ldquo;I don&apos;t just write code — I write code that works, and then I prove it.
                 Quality isn&apos;t a phase; it&apos;s the whole process.&rdquo;
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ width: 24, height: 1, background: "linear-gradient(90deg,#569CD6,#4EC9B0)" }} />
-                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#6A9955" }}>// Jhon Lloyd Samson</span>
+                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#858585" }}>Jhon Lloyd Samson</span>
               </div>
             </div>
           </TiltCard>
         </motion.div>
 
-        {/* Tags */}
         <motion.div variants={up(0.35)} initial="hidden" animate={inView ? "show" : "hidden"} className="md:col-span-2">
           <TiltCard>
             <div className="ide-titlebar">
@@ -173,8 +161,8 @@ export default function BentoGrid() {
                 competencies.ts
               </div>
             </div>
-            <div className="ide-body" style={{ fontSize: 12 }}>
-              <div style={{ color: "#6A9955", marginBottom: 10 }}>{"// Core Competencies"}</div>
+            <div style={{ padding: "16px 20px" }}>
+              <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13, color: "#ECECEC", marginBottom: 12 }}>Core Competencies</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {TAGS.map(tag => (
                   <span key={tag} className="skill-tag">{tag}</span>
