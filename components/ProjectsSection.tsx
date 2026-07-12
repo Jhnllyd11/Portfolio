@@ -13,7 +13,7 @@ const projects = [
     url: "localhost:8000/maritime-licensing",
     description:
       "A full-stack web-based system for fisheries and maritime licensing workflows. Handles license applications, renewals, and record management for the City Agriculture Office – Fisheries Development Center.",
-    tech: ["PHP", "Laravel", "MySQL", "Bootstrap", "JavaScript"],
+    tech: ["PHP", "Custom MVC", "MySQL", "Tailwind CSS", "HTML/CSS/JS", "PHPMailer"],
     highlights: [
       "End-to-end full-stack development",
       "Real-world stakeholder collaboration",
