@@ -4,7 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
 const STATS = [
-  { value: "4+",    label: "Projects Built",  color: "#569CD6", sub: "Full-Stack" },
+  { value: "2+",    label: "Systems Built",   color: "#569CD6", sub: "Web & Full-Stack" },
   { value: "486h",  label: "QA OJT",          color: "#22C55E", sub: "Wela Online Corp" },
   { value: "50+",   label: "E2E Tests",       color: "#F59E0B", sub: "Cypress Automated" },
   { value: "15+",   label: "Bugs Found",      color: "#F44747", sub: "Manual Testing" },
