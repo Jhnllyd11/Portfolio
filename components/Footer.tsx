@@ -127,7 +127,6 @@ export default function Footer() {
             <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
               ✓ 0 errors, 0 warnings
             </span>
-            <VsCodePet />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Fira Code', monospace", fontSize: 10, color: "rgba(255,255,255,0.8)" }}>
