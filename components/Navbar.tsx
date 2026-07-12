@@ -2,21 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { FileText, Menu, X } from "lucide-react";
+import { FileText, Menu, X, Folder, Search, GitBranch, Puzzle, Zap } from "lucide-react";
 
 const NAV = [
-  { label: "about.ts",    href: "#about",    dot: "#569CD6" },
-  { label: "timeline.ts", href: "#about",    dot: "#4EC9B0" },
-  { label: "stack.ts",    href: "#stack",    dot: "#C586C0" },
-  { label: "projects.ts", href: "#projects", dot: "#CE9178" },
-  { label: "certs.ts",    href: "#certs",    dot: "#B5CEA8" },
-  { label: "contact.ts",  href: "#contact",  dot: "#DCDCAA" },
+  { label: "about.ts",    href: "#about",    dot: "#569CD6", id: "about"    },
+  { label: "timeline.ts", href: "#about",    dot: "#4EC9B0", id: "timeline" },
+  { label: "stack.ts",    href: "#stack",    dot: "#C586C0", id: "stack"    },
+  { label: "projects.ts", href: "#projects", dot: "#CE9178", id: "projects" },
+  { label: "certs.ts",    href: "#certs",    dot: "#B5CEA8", id: "certs"    },
+  { label: "contact.ts",  href: "#contact",  dot: "#DCDCAA", id: "contact"  },
+];
+
+const ACTIVITY_ICONS = [
+  { icon: Folder,    title: "Explorer" },
+  { icon: Search,    title: "Search"   },
+  { icon: GitBranch, title: "Source Control" },
+  { icon: Puzzle,    title: "Extensions" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("");
+  const [open, setOpen]         = useState(false);
+  const [active, setActive]     = useState("about");
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
@@ -36,7 +43,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Scroll progress */}
+      {/* Scroll progress bar */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 2, zIndex: 60, pointerEvents: "none" }}>
         <motion.div style={{ height: "100%", scaleX, transformOrigin: "left", background: "linear-gradient(90deg,#569CD6,#4EC9B0)" }} />
       </div>
@@ -47,15 +54,56 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-          background: scrolled ? "rgba(30,30,30,0.95)" : "rgba(30,30,30,0.7)",
+          background: scrolled ? "rgba(30,30,30,0.97)" : "rgba(30,30,30,0.75)",
           backdropFilter: "blur(20px)",
           borderBottom: "1px solid #3E3E42",
           transition: "background 0.3s",
+          display: "flex",
         }}
       >
-        {/* Tab bar */}
-        <div style={{ display: "flex", alignItems: "stretch", height: 40, overflowX: "auto" }} className="ide-scroll">
-          {/* Logo tab */}
+        {/* ── Activity Bar ─────────────────────────────────────────── */}
+        <div style={{
+          width: 40,
+          borderRight: "1px solid #3E3E42",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          padding: "4px 0",
+          flexShrink: 0,
+        }}
+          className="hidden md:flex"
+        >
+          {ACTIVITY_ICONS.map(({ icon: Icon, title }) => (
+            <div
+              key={title}
+              title={title}
+              style={{
+                width: 32, height: 32,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                borderRadius: 4, color: "#858585",
+                transition: "color 0.15s, background 0.15s",
+                cursor: "default",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.color = "#D4D4D4";
+                (e.currentTarget as HTMLElement).style.background = "#2A2D2E";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.color = "#858585";
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              <Icon size={14} />
+            </div>
+          ))}
+        </div>
+
+        {/* ── Tab Bar ──────────────────────────────────────────────── */}
+        <div style={{ flex: 1, display: "flex", alignItems: "stretch", height: 40, overflowX: "auto" }} className="ide-scroll">
+
+          {/* Logo */}
           <a href="#" style={{
             display: "flex", alignItems: "center", gap: 8,
             padding: "0 16px", borderRight: "1px solid #3E3E42",
@@ -74,26 +122,39 @@ export default function Navbar() {
           </a>
 
           {/* Nav tabs — desktop */}
-          <nav className="hidden md:flex" style={{ alignItems: "stretch" }}>
-            {NAV.map(({ label, href, dot }) => {
-              const id = href.slice(1);
-              const isActive = active === id || (id === "about" && (active === "about" || active === ""));
+          <nav className="hidden md:flex" style={{ alignItems: "stretch", position: "relative" }}>
+            {NAV.map(({ label, href, dot, id }) => {
+              const isActive = active === id || (id === "about" && active === "about");
               return (
                 <a key={label} href={href}
                   style={{
+                    position: "relative",
                     display: "flex", alignItems: "center", gap: 6,
                     padding: "0 14px", height: "100%",
                     fontFamily: "'Fira Code', monospace", fontSize: 11,
                     color: isActive ? "#D4D4D4" : "#858585",
                     borderRight: "1px solid #3E3E42",
-                    borderTop: isActive ? "1px solid #569CD6" : "1px solid transparent",
                     background: isActive ? "#1E1E1E" : "transparent",
                     textDecoration: "none", flexShrink: 0,
-                    transition: "all 0.15s",
+                    transition: "color 0.15s, background 0.15s",
+                    overflow: "hidden",
                   }}
                   onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#2A2D2E"; }}
                   onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
+                  {/* Animated top border indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      style={{
+                        position: "absolute", top: 0, left: 0, right: 0,
+                        height: 2,
+                        background: "linear-gradient(90deg,#569CD6,#4EC9B0)",
+                        borderRadius: "0 0 2px 2px",
+                      }}
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
+                  )}
                   <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0 }} />
                   {label}
                 </a>
@@ -104,8 +165,28 @@ export default function Navbar() {
           {/* Spacer */}
           <div style={{ flex: 1 }} />
 
+          {/* ── Available for work badge ──────────────────────────── */}
+          <div
+            className="hidden md:flex"
+            style={{
+              alignItems: "center", gap: 6,
+              padding: "0 14px",
+              borderLeft: "1px solid #3E3E42",
+              borderRight: "1px solid #3E3E42",
+            }}
+          >
+            <motion.div
+              animate={{ opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{ width: 7, height: 7, borderRadius: "50%", background: "#28C840", boxShadow: "0 0 6px #28C840" }}
+            />
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#28C840", whiteSpace: "nowrap" }}>
+              available for work
+            </span>
+          </div>
+
           {/* Resume + mobile toggle */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px", borderLeft: "1px solid #3E3E42" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px" }}>
             <a href="/images/CV/CV Resume.png" target="_blank" rel="noopener noreferrer"
               className="hidden md:flex"
               style={{
@@ -128,31 +209,38 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            style={{ background: "#252526", borderTop: "1px solid #3E3E42", padding: "8px 0" }}
-          >
-            {NAV.map(({ label, href, dot }) => (
-              <a key={label} href={href} onClick={() => setOpen(false)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  padding: "10px 20px", fontFamily: "'Fira Code', monospace",
-                  fontSize: 12, color: "#858585", textDecoration: "none",
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; }}
-              >
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot }} />
-                {label}
-              </a>
-            ))}
-          </motion.div>
-        )}
       </motion.header>
+
+      {/* Mobile menu */}
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          style={{
+            position: "fixed", top: 40, left: 0, right: 0, zIndex: 49,
+            background: "#252526", borderBottom: "1px solid #3E3E42", padding: "8px 0",
+          }}
+        >
+          {/* Available for work — mobile */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px 4px", borderBottom: "1px solid #3E3E42", marginBottom: 4 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#28C840", boxShadow: "0 0 5px #28C840" }} />
+            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#28C840" }}>available for work</span>
+          </div>
+          {NAV.map(({ label, href, dot }) => (
+            <a key={label} href={href} onClick={() => setOpen(false)}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "10px 20px", fontFamily: "'Fira Code', monospace",
+                fontSize: 12, color: "#858585", textDecoration: "none", transition: "color 0.15s",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; }}
+            >
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot }} />
+              {label}
+            </a>
+          ))}
+        </motion.div>
+      )}
     </>
   );
 }
