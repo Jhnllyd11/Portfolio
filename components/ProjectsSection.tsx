@@ -189,7 +189,7 @@ export default function ProjectsSection() {
               </div>
 
               {/* Content */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+              <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 0 }}>
                 {/* Left: image + tech */}
                 <div style={{ padding: 20, borderRight: "1px solid #3E3E42" }}>
                   <ImageCarousel images={p.images} color={p.color} onOpen={i => p.images.length && setLightbox({ images: p.images, idx: i })} />
@@ -298,11 +298,11 @@ export default function ProjectsSection() {
               {lightbox.images.length > 1 && (
                 <>
                   <button onClick={() => setLightbox(l => l && ({ ...l, idx: (l.idx - 1 + l.images.length) % l.images.length }))}
-                    style={{ position: "absolute", left: -44, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                     <ChevronLeft size={18} />
                   </button>
                   <button onClick={() => setLightbox(l => l && ({ ...l, idx: (l.idx + 1) % l.images.length }))}
-                    style={{ position: "absolute", right: -44, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: "#2D2D30", border: "1px solid #3E3E42", borderRadius: 6, width: 36, height: 36, color: "#D4D4D4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                     <ChevronRight size={18} />
                   </button>
                 </>

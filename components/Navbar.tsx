@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { FileText, Menu, X, Folder, Search, GitBranch, Puzzle, Zap } from "lucide-react";
+import { FileText, Menu, X, Folder, Search, GitBranch, Puzzle } from "lucide-react";
 
 const NAV = [
   { label: "about.ts",    href: "#about",    dot: "#569CD6", id: "about"    },
@@ -14,10 +14,10 @@ const NAV = [
 ];
 
 const ACTIVITY_ICONS = [
-  { icon: Folder,    title: "Explorer" },
-  { icon: Search,    title: "Search"   },
+  { icon: Folder,    title: "Explorer"       },
+  { icon: Search,    title: "Search"         },
   { icon: GitBranch, title: "Source Control" },
-  { icon: Puzzle,    title: "Extensions" },
+  { icon: Puzzle,    title: "Extensions"     },
 ];
 
 export default function Navbar() {
@@ -59,30 +59,81 @@ export default function Navbar() {
           borderBottom: "1px solid #3E3E42",
           transition: "background 0.3s",
           display: "flex",
+          alignItems: "stretch",
+          height: 40,
         }}
       >
-        {/* ── Activity Bar ─────────────────────────────────────────── */}
-        <div style={{
-          width: 40,
-          borderRight: "1px solid #3E3E42",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 2,
-          padding: "4px 0",
-          flexShrink: 0,
-        }}
-          className="hidden md:flex"
-        >
+        {/* Logo */}
+        <a href="#" style={{
+          display: "flex", alignItems: "center", gap: 8,
+          padding: "0 16px", borderRight: "1px solid #3E3E42",
+          fontFamily: "'Fira Code', monospace", fontSize: 12,
+          color: "#D4D4D4", textDecoration: "none", flexShrink: 0,
+        }}>
+          <span style={{
+            width: 20, height: 20, borderRadius: 4,
+            background: "linear-gradient(135deg,#569CD6,#4EC9B0)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 9, fontWeight: 700, color: "#1E1E1E",
+          }}>JL</span>
+          <span style={{ color: "#9CDCFE" }}>jhon-lloyd</span>
+          <span style={{ color: "#808080" }}>/</span>
+          <span style={{ color: "#CE9178" }}>portfolio</span>
+        </a>
+
+        {/* Nav tabs */}
+        <nav className="hidden md:flex" style={{ alignItems: "stretch" }}>
+          {NAV.map(({ label, href, dot, id }) => {
+            const isActive = active === id || (id === "about" && active === "about");
+            return (
+              <a key={label} href={href}
+                style={{
+                  position: "relative",
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "0 14px", height: "100%",
+                  fontFamily: "'Fira Code', monospace", fontSize: 11,
+                  color: isActive ? "#D4D4D4" : "#858585",
+                  borderRight: "1px solid #3E3E42",
+                  background: isActive ? "#1E1E1E" : "transparent",
+                  textDecoration: "none", flexShrink: 0,
+                  transition: "color 0.15s, background 0.15s",
+                }}
+                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#2A2D2E"; }}
+                onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    style={{
+                      position: "absolute", top: 0, left: 0, right: 0,
+                      height: 2,
+                      background: "linear-gradient(90deg,#569CD6,#4EC9B0)",
+                    }}
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0 }} />
+                {label}
+              </a>
+            );
+          })}
+        </nav>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Activity icons — horizontal, beside available badge */}
+        <div className="hidden md:flex" style={{
+          alignItems: "center", gap: 2,
+          padding: "0 8px",
+          borderLeft: "1px solid #3E3E42",
+        }}>
           {ACTIVITY_ICONS.map(({ icon: Icon, title }) => (
-            <div
-              key={title}
-              title={title}
+            <div key={title} title={title}
               style={{
-                width: 32, height: 32,
+                width: 28, height: 28,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                borderRadius: 4, color: "#858585",
+                borderRadius: 4, color: "#555",
                 transition: "color 0.15s, background 0.15s",
                 cursor: "default",
               }}
@@ -91,123 +142,54 @@ export default function Navbar() {
                 (e.currentTarget as HTMLElement).style.background = "#2A2D2E";
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = "#858585";
+                (e.currentTarget as HTMLElement).style.color = "#555";
                 (e.currentTarget as HTMLElement).style.background = "transparent";
               }}
             >
-              <Icon size={14} />
+              <Icon size={13} />
             </div>
           ))}
         </div>
 
-        {/* ── Tab Bar ──────────────────────────────────────────────── */}
-        <div style={{ flex: 1, display: "flex", alignItems: "stretch", height: 40, overflowX: "auto" }} className="ide-scroll">
+        {/* Available for work */}
+        <div className="hidden md:flex" style={{
+          alignItems: "center", gap: 6,
+          padding: "0 14px",
+          borderLeft: "1px solid #3E3E42",
+          borderRight: "1px solid #3E3E42",
+        }}>
+          <motion.div
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ width: 7, height: 7, borderRadius: "50%", background: "#28C840", boxShadow: "0 0 6px #28C840" }}
+          />
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#28C840", whiteSpace: "nowrap" }}>
+            available for work
+          </span>
+        </div>
 
-          {/* Logo */}
-          <a href="#" style={{
-            display: "flex", alignItems: "center", gap: 8,
-            padding: "0 16px", borderRight: "1px solid #3E3E42",
-            fontFamily: "'Fira Code', monospace", fontSize: 12,
-            color: "#D4D4D4", textDecoration: "none", flexShrink: 0,
-          }}>
-            <span style={{
-              width: 20, height: 20, borderRadius: 4,
-              background: "linear-gradient(135deg,#569CD6,#4EC9B0)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 9, fontWeight: 700, color: "#1E1E1E",
-            }}>JL</span>
-            <span style={{ color: "#9CDCFE" }}>jhon-lloyd</span>
-            <span style={{ color: "#808080" }}>/</span>
-            <span style={{ color: "#CE9178" }}>portfolio</span>
-          </a>
-
-          {/* Nav tabs — desktop */}
-          <nav className="hidden md:flex" style={{ alignItems: "stretch", position: "relative" }}>
-            {NAV.map(({ label, href, dot, id }) => {
-              const isActive = active === id || (id === "about" && active === "about");
-              return (
-                <a key={label} href={href}
-                  style={{
-                    position: "relative",
-                    display: "flex", alignItems: "center", gap: 6,
-                    padding: "0 14px", height: "100%",
-                    fontFamily: "'Fira Code', monospace", fontSize: 11,
-                    color: isActive ? "#D4D4D4" : "#858585",
-                    borderRight: "1px solid #3E3E42",
-                    background: isActive ? "#1E1E1E" : "transparent",
-                    textDecoration: "none", flexShrink: 0,
-                    transition: "color 0.15s, background 0.15s",
-                    overflow: "hidden",
-                  }}
-                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "#2A2D2E"; }}
-                  onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                >
-                  {/* Animated top border indicator */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTab"
-                      style={{
-                        position: "absolute", top: 0, left: 0, right: 0,
-                        height: 2,
-                        background: "linear-gradient(90deg,#569CD6,#4EC9B0)",
-                        borderRadius: "0 0 2px 2px",
-                      }}
-                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                    />
-                  )}
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0 }} />
-                  {label}
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* ── Available for work badge ──────────────────────────── */}
-          <div
+        {/* Resume + mobile toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px" }}>
+          <a href="/images/CV/CV Resume.png" target="_blank" rel="noopener noreferrer"
             className="hidden md:flex"
             style={{
-              alignItems: "center", gap: 6,
-              padding: "0 14px",
-              borderLeft: "1px solid #3E3E42",
-              borderRight: "1px solid #3E3E42",
+              alignItems: "center", gap: 6, padding: "4px 12px",
+              background: "rgba(86,156,214,0.1)", border: "1px solid rgba(86,156,214,0.3)",
+              borderRadius: 4, fontFamily: "'Fira Code', monospace", fontSize: 11,
+              color: "#569CD6", textDecoration: "none", transition: "all 0.2s",
             }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.2)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.1)"; }}
           >
-            <motion.div
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-              style={{ width: 7, height: 7, borderRadius: "50%", background: "#28C840", boxShadow: "0 0 6px #28C840" }}
-            />
-            <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#28C840", whiteSpace: "nowrap" }}>
-              available for work
-            </span>
-          </div>
-
-          {/* Resume + mobile toggle */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 12px" }}>
-            <a href="/images/CV/CV Resume.png" target="_blank" rel="noopener noreferrer"
-              className="hidden md:flex"
-              style={{
-                alignItems: "center", gap: 6, padding: "4px 12px",
-                background: "rgba(86,156,214,0.1)", border: "1px solid rgba(86,156,214,0.3)",
-                borderRadius: 4, fontFamily: "'Fira Code', monospace", fontSize: 11,
-                color: "#569CD6", textDecoration: "none", transition: "all 0.2s",
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.2)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.1)"; }}
-            >
-              <FileText size={11} /> resume.pdf
-            </a>
-            <button
-              className="md:hidden"
-              style={{ background: "none", border: "none", color: "#858585", padding: 4 }}
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <X size={16} /> : <Menu size={16} />}
-            </button>
-          </div>
+            <FileText size={11} /> resume.pdf
+          </a>
+          <button
+            className="md:hidden"
+            style={{ background: "none", border: "none", color: "#858585", padding: 4 }}
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={16} /> : <Menu size={16} />}
+          </button>
         </div>
       </motion.header>
 
@@ -220,7 +202,6 @@ export default function Navbar() {
             background: "#252526", borderBottom: "1px solid #3E3E42", padding: "8px 0",
           }}
         >
-          {/* Available for work — mobile */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px 4px", borderBottom: "1px solid #3E3E42", marginBottom: 4 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#28C840", boxShadow: "0 0 5px #28C840" }} />
             <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#28C840" }}>available for work</span>

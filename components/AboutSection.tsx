@@ -173,7 +173,7 @@ export default function AboutSection() {
           </div>
         </div>
 
-        <div style={{ position: "relative", paddingLeft: "2.5rem" }}>
+        <div style={{ position: "relative", paddingLeft: "clamp(1.5rem, 4vw, 2.5rem)" }}>
           {/* Animated vertical line */}
           <div style={{ position: "absolute", left: 10, top: 0, bottom: 0, width: 1, background: "#3E3E42" }}>
             <motion.div

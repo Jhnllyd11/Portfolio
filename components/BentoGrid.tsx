@@ -100,7 +100,7 @@ export default function BentoGrid() {
           </TiltCard>
         </motion.div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }} className="md:grid-cols-1">
+        <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
           {COMPS.map((c, i) => {
             const Icon = c.icon;
             return (

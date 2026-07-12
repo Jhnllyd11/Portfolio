@@ -41,7 +41,15 @@ export default function ActivityFeed() {
     }))
   );
   const [tick, setTick] = useState(0);
+  const [visible, setVisible] = useState(true);
   const idxRef = { current: 4 };
+
+  useEffect(() => {
+    const check = () => setVisible(window.innerWidth >= 480);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Add new event every 4s
   useEffect(() => {
@@ -62,6 +70,8 @@ export default function ActivityFeed() {
     const t = setInterval(() => setTick(n => n + 1), 15000);
     return () => clearInterval(t);
   }, []);
+
+  if (!visible) return null;
 
   return (
     <div style={{
