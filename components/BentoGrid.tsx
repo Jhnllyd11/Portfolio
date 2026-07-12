@@ -60,7 +60,11 @@ export default function BentoGrid() {
     <section id="skills" ref={ref} className="section-wrap">
       <p className="section-label">Capabilities</p>
       <motion.h2 variants={up(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
-        Skills & Proficiency
+        <span style={{ color: "#C586C0" }}>const </span>
+        <span style={{ color: "#9CDCFE" }}>skills</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#4EC9B0" }}>Proficiency</span>
+        <span style={{ color: "#808080" }}> = &#123;...&#125;</span>
       </motion.h2>
 
       {/* Row 1 */}

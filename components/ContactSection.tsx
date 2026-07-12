@@ -3,7 +3,7 @@
 import { useRef, useState, FormEvent } from "react";
 import { motion, useInView } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { Send, CheckCircle, AlertCircle, Loader2, Github, Linkedin, Mail } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader2, Github, Linkedin, Mail, Terminal } from "lucide-react";
 
 const EMAILJS_SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID  ?? "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "YOUR_TEMPLATE_ID";
@@ -25,23 +25,26 @@ const fadeUp = (d = 0) => ({
 export default function ContactSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>("idle");
+  const [fields, setFields] = useState({ from_name: "", reply_to: "", subject: "", message: "" });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!formRef.current || status === "sending") return;
+    if (status === "sending") return;
     setStatus("sending");
     try {
-      await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formRef.current, EMAILJS_PUBLIC_KEY);
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, fields, EMAILJS_PUBLIC_KEY);
       setStatus("success");
-      formRef.current.reset();
+      setFields({ from_name: "", reply_to: "", subject: "", message: "" });
       setTimeout(() => setStatus("idle"), 5000);
     } catch {
       setStatus("error");
       setTimeout(() => setStatus("idle"), 5000);
     }
   };
+
+  const set = (k: keyof typeof fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setFields(f => ({ ...f, [k]: e.target.value }));
 
   return (
     <section id="contact" ref={ref} className="section-wrap">
@@ -85,71 +88,87 @@ export default function ContactSection() {
           </div>
         </motion.div>
 
-        {/* Form */}
+        {/* Terminal Form */}
         <motion.div variants={fadeUp(0.2)} initial="hidden" animate={inView ? "show" : "hidden"} className="md:col-span-3">
-          <div className="ide-window">
-            <div className="ide-titlebar">
-              <div className="flex items-center gap-1.5 px-3">
-                <div className="browser-dot" style={{ background: "#FF5F57" }} />
-                <div className="browser-dot" style={{ background: "#FEBC2E" }} />
-                <div className="browser-dot" style={{ background: "#28C840" }} />
-              </div>
-              <div className="ide-tab active">
-                <div className="ide-tab-dot" style={{ background: "#DCDCAA" }} />
-                send_message.ts
+          <div className="terminal">
+            <div className="terminal-bar">
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28C840" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginLeft: 8 }}>
+                <Terminal size={10} style={{ color: "#858585" }} />
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585" }}>bash — send_message</span>
               </div>
             </div>
 
-            <form ref={formRef} onSubmit={handleSubmit} style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Name</label>
-                  <input name="from_name" required placeholder="Your full name" className="ide-input" />
-                </div>
-                <div>
-                  <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Email</label>
-                  <input name="reply_to" type="email" required placeholder="your@email.com" className="ide-input" />
-                </div>
+            <form onSubmit={handleSubmit} style={{ padding: "14px 18px" }}>
+              {/* Command header */}
+              <div style={{ marginBottom: 14 }}>
+                <span className="terminal-prompt" style={{ fontSize: 12 }}>user@portfolio:~$ </span>
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#D4D4D4" }}>
+                  send_message --to=&quot;hiring&quot;
+                </span>
               </div>
 
-              <div>
-                <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Subject</label>
-                <input name="subject" required placeholder="Job opportunity / Project inquiry / etc." className="ide-input" />
+              <div className="terminal-form-line">
+                <label>--name=</label>
+                <input
+                  name="from_name" required value={fields.from_name} onChange={set("from_name")}
+                  placeholder="Your full name"
+                />
+              </div>
+              <div className="terminal-form-line">
+                <label>--email=</label>
+                <input
+                  name="reply_to" type="email" required value={fields.reply_to} onChange={set("reply_to")}
+                  placeholder="your@email.com"
+                />
+              </div>
+              <div className="terminal-form-line">
+                <label>--subject=</label>
+                <input
+                  name="subject" required value={fields.subject} onChange={set("subject")}
+                  placeholder="Job opportunity / Project inquiry"
+                />
+              </div>
+              <div className="terminal-form-line" style={{ alignItems: "flex-start" }}>
+                <label style={{ paddingTop: 2 }}>--message=</label>
+                <textarea
+                  name="message" required rows={4} value={fields.message} onChange={set("message")}
+                  placeholder="Tell me about the role or project..."
+                />
               </div>
 
-              <div>
-                <label style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#A0A0A0", display: "block", marginBottom: 6 }}>Message</label>
-                <textarea name="message" required rows={5} placeholder="Tell me about the role or project..." className="ide-input" style={{ resize: "none" }} />
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              {/* Submit line */}
+              <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <span className="terminal-prompt" style={{ fontSize: 12 }}>user@portfolio:~$ </span>
                 <button type="submit"
                   disabled={status === "sending" || status === "success"}
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    padding: "9px 22px", borderRadius: 5,
-                    background: "#569CD6", border: "1px solid #569CD6",
-                    fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: 13, color: "#1E1E1E",
+                    padding: "6px 18px", borderRadius: 4,
+                    background: "rgba(86,156,214,0.15)", border: "1px solid rgba(86,156,214,0.4)",
+                    fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6",
                     transition: "all 0.2s", opacity: status === "sending" || status === "success" ? 0.6 : 1, cursor: "pointer",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#4A8BC4"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "#569CD6"; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.25)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(86,156,214,0.15)"; }}
                 >
-                  {status === "sending" ? <><Loader2 size={13} className="animate-spin" /> Sending…</>
-                    : status === "success" ? <><CheckCircle size={13} /> Sent!</>
-                    : <><Send size={13} /> Send Message</>}
+                  {status === "sending" ? <><Loader2 size={12} className="animate-spin" /> executing…</>
+                    : status === "success" ? <><CheckCircle size={12} /> sent ✓</>
+                    : <>./send.sh</>}
                 </button>
 
                 {status === "success" && (
                   <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                    style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#4EC9B0", display: "flex", alignItems: "center", gap: 5 }}>
-                    <CheckCircle size={12} /> Message sent! I&apos;ll reply within 24h.
+                    style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#22C55E", display: "flex", alignItems: "center", gap: 5 }}>
+                    <CheckCircle size={11} /> exit 0 — message delivered
                   </motion.span>
                 )}
                 {status === "error" && (
                   <motion.span initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                    style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#F44747", display: "flex", alignItems: "center", gap: 5 }}>
-                    <AlertCircle size={12} /> Failed to send. Please try again or email directly.
+                    style={{ fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#F44747", display: "flex", alignItems: "center", gap: 5 }}>
+                    <AlertCircle size={11} /> exit 1 — retry or email directly
                   </motion.span>
                 )}
               </div>

@@ -40,9 +40,7 @@ export default function ActivityFeed() {
       ...e, id: uid++, time: timeAgo((4 - i) * 18),
     }))
   );
-  const [tick, setTick] = useState(0);
   const [visible, setVisible] = useState(true);
-  const idxRef = { current: 4 };
 
   useEffect(() => {
     const check = () => setVisible(window.innerWidth >= 480);
@@ -67,7 +65,7 @@ export default function ActivityFeed() {
 
   // Update timestamps every 15s
   useEffect(() => {
-    const t = setInterval(() => setTick(n => n + 1), 15000);
+    const t = setInterval(() => setEvents(prev => [...prev]), 15000);
     return () => clearInterval(t);
   }, []);
 

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { GraduationCap, MapPin, Mail, Phone, Briefcase } from "lucide-react";
+import { GraduationCap, MapPin, Mail, Briefcase } from "lucide-react";
 
 const STATS = [
   { v: "4+",     label: "Years of Development",  color: "#569CD6" },
@@ -24,6 +24,10 @@ const TIMELINE = [
       "Created test cases, checklists, eLibrary docs, and meeting minutes; presented V11–V15 Data Migration tool.",
       "Conducted data migration checks, staging validation, Role Permission Manager review, and Passbolt setup.",
     ],
+    challengeSolution: {
+      challenge: "Identified 15+ critical bugs across Sprint Cycle, Backlog, and Timesheet modules during manual testing.",
+      solution: "Built Cypress E2E suite automating 50+ test cases — reduced regression testing time by ~40%.",
+    },
   },
   {
     role: "Web Developer — Capstone",
@@ -36,6 +40,10 @@ const TIMELINE = [
       "Designed database structure and core modules for fisheries and maritime licensing workflows.",
       "Applied QA practices from OJT to test and debug features prior to deployment.",
     ],
+    challengeSolution: {
+      challenge: "No existing digital system for maritime licensing — all records were paper-based and error-prone.",
+      solution: "Delivered a full-stack PHP/MySQL MVC system handling applications, renewals, and record management.",
+    },
   },
   {
     role: "Video Editor / Virtual Assistant",
@@ -47,6 +55,7 @@ const TIMELINE = [
       "Edited client video content ensuring quality, consistency, and timely turnaround.",
       "Coordinated remotely to align outputs with client branding guidelines.",
     ],
+    challengeSolution: null,
   },
   {
     role: "Computer Assembler & Data Encoder",
@@ -58,6 +67,7 @@ const TIMELINE = [
       "Assembled and configured computer units; encoded inventory and transaction records.",
       "Assisted customers with hardware troubleshooting and repair documentation.",
     ],
+    challengeSolution: null,
   },
 ];
 
@@ -74,7 +84,11 @@ export default function AboutSection() {
     <section id="about" ref={ref} className="section-wrap">
       <p className="section-label">Who I Am</p>
       <motion.h2 variants={up(0.05)} initial="hidden" animate={inView ? "show" : "hidden"} className="section-title">
-        About Me
+        <span style={{ color: "#C586C0" }}>const </span>
+        <span style={{ color: "#9CDCFE" }}>me</span>
+        <span style={{ color: "#808080" }}>: </span>
+        <span style={{ color: "#4EC9B0" }}>Developer</span>
+        <span style={{ color: "#808080" }}> = &#123;...&#125;</span>
       </motion.h2>
 
       {/* Bio + Stats */}
@@ -113,8 +127,7 @@ export default function AboutSection() {
             <div className="grid sm:grid-cols-2 gap-2">
               {[
                 { icon: GraduationCap, text: "BS Information Systems · DNSC · 2022–2026", color: "#569CD6" },
-                { icon: MapPin,        text: "Prk. 3, Brgy. Taba, Carmen, Davao del Norte", color: "#4EC9B0" },
-                { icon: Phone,         text: "(+63) 994-375-3635", color: "#C586C0" },
+                { icon: MapPin,        text: "Carmen, Davao del Norte, Philippines", color: "#4EC9B0" },
                 { icon: Mail,          text: "Jhonlloydsamson11@gmail.com", color: "#CE9178", href: "mailto:Jhonlloydsamson11@gmail.com" },
               ].map(({ icon: Icon, text, color, href }) => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -239,6 +252,21 @@ export default function AboutSection() {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Challenge → Solution flow */}
+                    {t.challengeSolution && (
+                      <div className="challenge-solution" style={{ marginTop: 12 }}>
+                        <div className="challenge-box">
+                          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#F44747", marginBottom: 4, letterSpacing: "0.1em" }}>CHALLENGE</p>
+                          {t.challengeSolution.challenge}
+                        </div>
+                        <div className="cs-arrow" style={{ textAlign: "center" }}>→</div>
+                        <div className="solution-box">
+                          <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 9, color: "#22C55E", marginBottom: 4, letterSpacing: "0.1em" }}>SOLUTION</p>
+                          {t.challengeSolution.solution}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -8,10 +8,12 @@ const CustomCursor     = dynamic(() => import("@/components/CustomCursor"),     
 const ScrollBackground = dynamic(() => import("@/components/ScrollBackground"), { ssr: false });
 const Navbar           = dynamic(() => import("@/components/Navbar"),           { ssr: false });
 const HeroSection      = dynamic(() => import("@/components/HeroSection"),      { ssr: false });
-const AboutSection     = dynamic(() => import("@/components/AboutSection"),     { ssr: false });
-const TechStack        = dynamic(() => import("@/components/TechStack"),        { ssr: false });
-const BentoGrid        = dynamic(() => import("@/components/BentoGrid"),        { ssr: false });
+const StatsStrip       = dynamic(() => import("@/components/StatsStrip"),       { ssr: false });
 const ProjectsSection  = dynamic(() => import("@/components/ProjectsSection"),  { ssr: false });
+const QuoteDivider     = dynamic(() => import("@/components/QuoteDivider"),     { ssr: false });
+const TechStack        = dynamic(() => import("@/components/TechStack"),        { ssr: false });
+const AboutSection     = dynamic(() => import("@/components/AboutSection"),     { ssr: false });
+const BentoGrid        = dynamic(() => import("@/components/BentoGrid"),        { ssr: false });
 const CertsSection     = dynamic(() => import("@/components/CertsSection"),     { ssr: false });
 const ContactSection   = dynamic(() => import("@/components/ContactSection"),   { ssr: false });
 const Footer           = dynamic(() => import("@/components/Footer"),           { ssr: false });
@@ -70,10 +72,12 @@ export default function Home() {
       {/* z-10: page sections */}
       <main style={{ position: "relative", zIndex: 10 }}>
         <HeroSection />
-        <AboutSection />
-        <TechStack />
-        <BentoGrid />
+        <StatsStrip />
         <ProjectsSection />
+        <QuoteDivider />
+        <TechStack />
+        <AboutSection />
+        <BentoGrid />
         <CertsSection />
         <ContactSection />
         <Footer />

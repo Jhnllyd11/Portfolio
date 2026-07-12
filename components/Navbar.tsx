@@ -6,9 +6,9 @@ import { FileText, Menu, X, Folder, Search, GitBranch, Puzzle } from "lucide-rea
 
 const NAV = [
   { label: "about.ts",    href: "#about",    dot: "#569CD6", id: "about"    },
-  { label: "timeline.ts", href: "#about",    dot: "#4EC9B0", id: "timeline" },
-  { label: "stack.ts",    href: "#stack",    dot: "#C586C0", id: "stack"    },
   { label: "projects.ts", href: "#projects", dot: "#CE9178", id: "projects" },
+  { label: "stack.ts",    href: "#stack",    dot: "#C586C0", id: "stack"    },
+  { label: "skills.ts",   href: "#skills",   dot: "#4EC9B0", id: "skills"   },
   { label: "certs.ts",    href: "#certs",    dot: "#B5CEA8", id: "certs"    },
   { label: "contact.ts",  href: "#contact",  dot: "#DCDCAA", id: "contact"  },
 ];

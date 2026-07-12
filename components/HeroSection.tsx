@@ -1,12 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, Eye, ArrowRight } from "lucide-react";
+import { Github, Linkedin, Facebook, Instagram, MapPin, FileText, X, Download, Eye, ArrowRight, Terminal } from "lucide-react";
 
-const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation"];
+const ROLES = ["Full-Stack Developer", "QA Engineer", "Laravel Developer", "Cypress Automation", "Next.js Developer"];
 const CV = "/images/CV/CV Resume.png";
+
+const TERMINAL_LINES = [
+  { prompt: "user@portfolio:~$", cmd: " whoami", delay: 0 },
+  { output: "jhon-lloyd-samson", color: "#4EC9B0", delay: 600 },
+  { prompt: "user@portfolio:~$", cmd: " cat skills.txt", delay: 1200 },
+  { output: "→ PHP · Laravel · Next.js · TypeScript", color: "#9CDCFE", delay: 1800 },
+  { output: "→ Cypress · Manual Testing · Test Design", color: "#22C55E", delay: 2400 },
+  { output: "→ MySQL · Flutter · Git · VS Code", color: "#CE9178", delay: 3000 },
+  { prompt: "user@portfolio:~$", cmd: " echo $STATUS", delay: 3600 },
+  { output: "✓ open_to_work=true | qa_certified=true", color: "#22C55E", delay: 4200 },
+  { prompt: "user@portfolio:~$", cmd: " _", delay: 4800, cursor: true },
+];
 
 const socials = [
   { icon: Github,    href: "https://github.com/Jhnllyd11",                             label: "GitHub" },
@@ -15,27 +27,30 @@ const socials = [
   { icon: Instagram, href: "https://www.instagram.com/jqnllyd",                       label: "Instagram" },
 ];
 
-// The ONE place syntax highlighting is used — the hero name block
 function SyntaxName() {
   return (
     <div style={{ fontFamily: "'Fira Code', monospace", lineHeight: 1.2 }}>
-      <div style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)", fontWeight: 600 }}>
+      <div style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", fontWeight: 600 }}>
         <span style={{ color: "#C586C0" }}>const </span>
         <span style={{ color: "#9CDCFE" }}>developer</span>
         <span style={{ color: "#808080" }}> = &#123;</span>
       </div>
-      <div style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", fontWeight: 700, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#ECECEC" }}>
+      <div style={{ fontSize: "clamp(1.3rem, 3vw, 2.2rem)", fontWeight: 700, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#ECECEC" }}>
         <span style={{ color: "#9CDCFE", fontWeight: 400, fontSize: "0.6em" }}>name</span>
         <span style={{ color: "#808080", fontWeight: 400, fontSize: "0.6em" }}>: </span>
         <span style={{ color: "#CE9178" }}>&quot;Jhon Lloyd Samson&quot;</span>
       </div>
-      <div style={{ fontSize: "clamp(0.9rem, 2vw, 1.3rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#A0A0A0" }}>
-        <span style={{ color: "#9CDCFE" }}>location</span>
+      <div style={{ fontSize: "clamp(0.85rem, 1.8vw, 1.1rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)", color: "#A0A0A0" }}>
+        <span style={{ color: "#9CDCFE" }}>role</span>
         <span style={{ color: "#808080" }}>: </span>
-        <span style={{ color: "#CE9178" }}>&quot;Davao del Norte, PH&quot;</span>
+        <span style={{ color: "#CE9178" }}>&quot;</span>
+        <span style={{ color: "#569CD6" }}>I build</span>
+        <span style={{ color: "#808080" }}> &amp; </span>
+        <span style={{ color: "#22C55E" }}>automate</span>
+        <span style={{ color: "#CE9178" }}>&quot;</span>
         <span style={{ color: "#808080" }}>,</span>
       </div>
-      <div style={{ fontSize: "clamp(0.9rem, 2vw, 1.3rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
+      <div style={{ fontSize: "clamp(0.85rem, 1.8vw, 1.1rem)", fontWeight: 400, paddingLeft: "clamp(1rem, 3vw, 2rem)" }}>
         <span style={{ color: "#9CDCFE" }}>status</span>
         <span style={{ color: "#808080" }}>: </span>
         <span style={{ color: "#CE9178" }}>&quot;</span>
@@ -43,8 +58,57 @@ function SyntaxName() {
         <span style={{ color: "#CE9178" }}>&quot;</span>
         <span style={{ color: "#808080" }}>,</span>
       </div>
-      <div style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)", fontWeight: 600 }}>
+      <div style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)", fontWeight: 600 }}>
         <span style={{ color: "#808080" }}>&#125;;</span>
+      </div>
+    </div>
+  );
+}
+
+function TerminalTyping() {
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    const timers = TERMINAL_LINES.map((line, i) =>
+      setTimeout(() => setVisibleCount(i + 1), line.delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div className="terminal" style={{ height: "100%", minHeight: 280 }}>
+      <div className="terminal-bar">
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57" }} />
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E" }} />
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28C840" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginLeft: 8 }}>
+          <Terminal size={10} style={{ color: "#858585" }} />
+          <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 10, color: "#858585" }}>bash — portfolio</span>
+        </div>
+      </div>
+      <div className="terminal-body" style={{ padding: "14px 18px" }}>
+        {TERMINAL_LINES.slice(0, visibleCount).map((line, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: 3, flexWrap: "wrap" }}
+          >
+            {"prompt" in line && (
+              <>
+                <span className="terminal-prompt" style={{ fontSize: 12 }}>{line.prompt}</span>
+                <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#D4D4D4" }}>{line.cmd}</span>
+                {line.cursor && <span className="terminal-cursor" style={{ marginLeft: 2 }} />}
+              </>
+            )}
+            {"output" in line && (
+              <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: line.color, paddingLeft: 4 }}>
+                {line.output}
+              </span>
+            )}
+          </motion.div>
+        ))}
       </div>
     </div>
   );
@@ -74,136 +138,101 @@ export default function HeroSection() {
     <>
       <section className="relative min-h-screen flex items-center" style={{ background: "transparent" }}>
         <div className="section-wrap w-full pt-20">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
-            {/* Left: Avatar card */}
+          {/* Role badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "5px 14px", borderRadius: 4, marginBottom: 28,
+              background: "rgba(86,156,214,0.08)", border: "1px solid rgba(86,156,214,0.25)",
+            }}
+          >
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#858585" }}>Currently:</span>
+            <motion.span
+              key={roleIdx}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: roleVisible ? 1 : 0, y: roleVisible ? 0 : -4 }}
+              transition={{ duration: 0.25 }}
+              style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6" }}
+            >
+              {ROLES[roleIdx]}
+            </motion.span>
+          </motion.div>
+
+          {/* Split-screen */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+            {/* LEFT: Value prop + avatar + CTAs */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center gap-5 shrink-0"
             >
-              <div className="ide-window" style={{ width: 200 }}>
-                <div className="ide-titlebar">
-                  <div className="flex items-center gap-1.5 px-3">
-                    <div className="browser-dot" style={{ background: "#FF5F57" }} />
-                    <div className="browser-dot" style={{ background: "#FEBC2E" }} />
-                    <div className="browser-dot" style={{ background: "#28C840" }} />
+              {/* Syntax name */}
+              <div style={{ marginBottom: 20 }}>
+                <SyntaxName />
+              </div>
+
+              {/* Readable description */}
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#A0A0A0", marginBottom: 24, maxWidth: 460, lineHeight: 1.8 }}>
+                Full-Stack Developer & QA Engineer based in Davao del Norte.{" "}
+                <span style={{ color: "#C8C8C8" }}>486 hours of QA OJT</span> at Wela Online Corporation.
+                Capstone: <span style={{ color: "#4EC9B0" }}>Maritime Licensing System</span>.
+              </p>
+
+              {/* Avatar + socials row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                {/* Larger avatar with ring */}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <div style={{
+                    width: 72, height: 72, borderRadius: 10,
+                    padding: 2,
+                    background: "linear-gradient(135deg,#569CD6,#4EC9B0)",
+                  }}>
+                    <div style={{ borderRadius: 8, overflow: "hidden", width: "100%", height: "100%", position: "relative" }}>
+                      <Image src="/images/profile/avatar.jpg" alt="Jhon Lloyd Samson" fill className="object-cover" priority />
+                    </div>
                   </div>
-                  <div className="ide-tab active" style={{ fontSize: 10 }}>
-                    <div className="ide-tab-dot" style={{ background: "#CE9178" }} />
-                    avatar.jpg
-                  </div>
+                  {/* Online dot */}
+                  <span style={{
+                    position: "absolute", bottom: 4, right: 4,
+                    width: 12, height: 12, borderRadius: "50%",
+                    background: "#22C55E", border: "2px solid #1E1E1E",
+                    boxShadow: "0 0 6px #22C55E",
+                  }} />
                 </div>
-                <div style={{ padding: 12, background: "#1E1E1E" }}>
-                  <div className="relative" style={{ borderRadius: 6, overflow: "hidden", aspectRatio: "1" }}>
-                    <Image src="/images/profile/avatar.jpg" alt="Jhon Lloyd Samson" fill className="object-cover" priority />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#22C55E", fontWeight: 600 }}>Open to work</span>
                   </div>
-                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6 }}>
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full" style={{ background: "#22C55E", opacity: 0.75 }} />
-                      <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22C55E" }} />
-                    </span>
-                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#22C55E" }}>Open to work</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 8 }}>
                     <MapPin size={9} style={{ color: "#569CD6" }} />
                     <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, color: "#858585" }}>Davao del Norte, PH</span>
                   </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {socials.map(({ icon: Icon, href, label }) => (
+                      <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                        style={{
+                          width: 28, height: 28, borderRadius: 4,
+                          border: "1px solid #3E3E42", background: "#252526",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: "#858585", transition: "all 0.2s",
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
+                      >
+                        <Icon size={11} />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* CV thumbnail */}
-              <motion.button
-                onClick={() => setCvOpen(true)}
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                className="group relative rounded-lg overflow-hidden"
-                style={{ width: 80, border: "1px solid #3E3E42" }}
-              >
-                <Image src={CV} alt="CV" width={80} height={113} className="w-full object-cover" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: "rgba(30,30,30,0.85)" }}>
-                  <Eye size={12} style={{ color: "#569CD6" }} />
-                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 9, color: "#D4D4D4" }}>View CV</span>
-                </div>
-              </motion.button>
-
-              {/* Socials */}
-              <div className="flex gap-2">
-                {socials.map(({ icon: Icon, href, label }) => (
-                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-                    style={{
-                      width: 32, height: 32, borderRadius: 4,
-                      border: "1px solid #3E3E42", background: "#252526",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#858585", transition: "all 0.2s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#569CD6"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
-                  >
-                    <Icon size={13} />
-                  </a>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Right: Content */}
-            <div className="flex-1 text-center lg:text-left">
-
-              {/* Role badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  padding: "5px 14px", borderRadius: 4, marginBottom: 20,
-                  background: "rgba(86,156,214,0.08)", border: "1px solid rgba(86,156,214,0.25)",
-                }}
-              >
-                <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#858585" }}>Currently:</span>
-                <motion.span
-                  key={roleIdx}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: roleVisible ? 1 : 0, y: roleVisible ? 0 : -4 }}
-                  transition={{ duration: 0.25 }}
-                  style={{ fontFamily: "'Fira Code', monospace", fontSize: 12, color: "#569CD6" }}
-                >
-                  {ROLES[roleIdx]}
-                </motion.span>
-              </motion.div>
-
-              {/* Syntax name — the wow moment */}
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="text-left"
-              >
-                <SyntaxName />
-              </motion.div>
-
-              {/* Plain readable description */}
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                style={{ fontFamily: "Inter, sans-serif", fontSize: 15, color: "#A0A0A0", marginTop: 20, maxWidth: 480, lineHeight: 1.75 }}
-              >
-                I build full-stack web systems and automate quality assurance.{" "}
-                <span style={{ color: "#C8C8C8" }}>486 hours of QA OJT</span> at Wela Online Corporation.
-                Capstone: <span style={{ color: "#4EC9B0" }}>Maritime Licensing System</span>.
-              </motion.p>
-
-              {/* CTAs — plain readable buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 28, justifyContent: "center" }}
-                className="lg:justify-start"
-              >
+              {/* CTAs */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 28 }}>
                 <a href="#projects"
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
@@ -243,24 +272,44 @@ export default function HeroSection() {
                 >
                   <FileText size={13} /> View Resume
                 </button>
-              </motion.div>
+              </div>
 
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.65 }}
-                style={{ display: "flex", gap: 32, marginTop: 32, paddingTop: 24, borderTop: "1px solid #3E3E42", justifyContent: "center" }}
-                className="lg:justify-start"
+              {/* CV thumbnail */}
+              <motion.button
+                onClick={() => setCvOpen(true)}
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="group relative rounded-lg overflow-hidden"
+                style={{
+                  width: 80, border: "1px solid #3E3E42", display: "flex",
+                  flexDirection: "column", alignItems: "stretch", background: "#252526",
+                }}
               >
-                {[["4+", "Years Dev"], ["486h", "QA OJT"], ["3+", "Certifications"]].map(([v, l]) => (
-                  <div key={l}>
-                    <p style={{ fontFamily: "'Fira Code', monospace", fontSize: 22, fontWeight: 700, color: "#569CD6" }}>{v}</p>
-                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "#858585", marginTop: 2 }}>{l}</p>
+                <div style={{ padding: "4px 4px 0", background: "#2D2D30", display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#FF5F57" }} />
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#FEBC2E" }} />
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#28C840" }} />
+                  <span style={{ fontFamily: "'Fira Code', monospace", fontSize: 7, color: "#858585", marginLeft: 2 }}>cv.pdf</span>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <Image src={CV} alt="CV" width={80} height={113} className="w-full object-cover" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: "rgba(30,30,30,0.85)" }}>
+                    <Eye size={12} style={{ color: "#569CD6" }} />
+                    <span style={{ fontFamily: "Inter, sans-serif", fontSize: 9, color: "#D4D4D4" }}>View CV</span>
                   </div>
-                ))}
-              </motion.div>
-            </div>
+                </div>
+              </motion.button>
+            </motion.div>
+
+            {/* RIGHT: Terminal typing animation */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <TerminalTyping />
+            </motion.div>
           </div>
         </div>
 

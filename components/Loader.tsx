@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const BOOT_LINES = [
   { text: "$ initializing portfolio...", color: "#6A9955", delay: 0 },
-  { text: "> loading modules: [react, next, gsap, lenis]", color: "#9CDCFE", delay: 300 },
-  { text: "> compiling TypeScript...", color: "#569CD6", delay: 700 },
-  { text: "> running QA checks...", color: "#4EC9B0", delay: 1100 },
-  { text: "✓ build successful — jhon-lloyd-samson@portfolio", color: "#22C55E", delay: 1600 },
+  { text: "> loading modules: [react, next, gsap, lenis]", color: "#9CDCFE", delay: 250 },
+  { text: "> compiling TypeScript...", color: "#569CD6", delay: 600 },
+  { text: "> running QA checks...", color: "#4EC9B0", delay: 950 },
+  { text: "✓ build successful — jhon-lloyd-samson@portfolio", color: "#22C55E", delay: 1350 },
 ];
 
 export default function Loader({ onComplete }: { onComplete: () => void }) {
@@ -18,7 +18,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
     BOOT_LINES.forEach((line, i) => {
       setTimeout(() => setVisibleLines(prev => [...prev, i]), line.delay);
     });
-    const t = setTimeout(onComplete, 2600);
+    const t = setTimeout(onComplete, 2200);
     return () => clearTimeout(t);
   }, [onComplete]);
 
@@ -79,7 +79,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
                   style={{ height: "100%", background: "linear-gradient(90deg,#569CD6,#4EC9B0)", borderRadius: 99 }}
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
-                  transition={{ duration: 2.4, ease: "easeInOut" }}
+                  transition={{ duration: 2.0, ease: "easeInOut" }}
                 />
               </div>
             </div>

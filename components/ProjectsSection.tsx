@@ -3,9 +3,15 @@
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, Layers, CheckCircle2, X, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, Layers, CheckCircle2, X, ShieldCheck, FlaskConical } from "lucide-react";
 
-const projects = [
+type Badge = { label: string; icon: string; color: string };
+
+const projects: Array<{
+  index: string; title: string; subtitle: string; url: string; description: string;
+  tech: string[]; badge: Badge; highlights: string[]; images: string[];
+  github: string; live: string | null; period: string; color: string; type: string; file: string;
+}> = [
   {
     index: "01",
     title: "Maritime Licensing System",
@@ -14,6 +20,7 @@ const projects = [
     description:
       "A full-stack web-based system for fisheries and maritime licensing workflows. Handles license applications, renewals, and record management for the City Agriculture Office – Fisheries Development Center.",
     tech: ["PHP", "Custom MVC", "MySQL", "Tailwind CSS", "HTML/CSS/JS", "PHPMailer"],
+    badge: { label: "QA Audited", icon: "shield", color: "#22C55E" },
     highlights: [
       "End-to-end full-stack development",
       "Real-world stakeholder collaboration",
@@ -45,6 +52,7 @@ const projects = [
     description:
       "A comprehensive Cypress end-to-end test automation suite built during OJT. Covers login flows, Sprint Cycle creation, Product Backlog management, and role-based validation across multiple user types.",
     tech: ["Cypress", "JavaScript", "GitHub", "VS Code"],
+    badge: { label: "Test Coverage: High", icon: "flask", color: "#F59E0B" },
     highlights: [
       "E2E automation for login, Sprint & Backlog creation",
       "Role-based validation (PO, PM, Dev, QA roles)",
@@ -242,6 +250,16 @@ export default function ProjectsSection() {
                     </div>
                   </div>
 
+                  {/* QA / Coverage badge */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                    <span className="qa-badge" style={p.badge.icon === "flask" ? { background: "rgba(245,158,11,0.1)", borderColor: "rgba(245,158,11,0.35)", color: "#F59E0B" } : {}}>
+                      {p.badge.icon === "shield"
+                        ? <ShieldCheck size={9} />
+                        : <FlaskConical size={9} />}
+                      {p.badge.label}
+                    </span>
+                  </div>
+
                   {/* Links */}
                   <div style={{ display: "flex", gap: 8 }}>
                     <a href={p.github} target="_blank" rel="noopener noreferrer"
@@ -255,20 +273,31 @@ export default function ProjectsSection() {
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#D4D4D4"; (e.currentTarget as HTMLElement).style.borderColor = "#569CD6"; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#858585"; (e.currentTarget as HTMLElement).style.borderColor = "#3E3E42"; }}
                     >
-                      <Github size={11} /> github
+                      <Github size={11} /> View Code
                     </a>
-                    {p.live && (
-                      <a href={p.live} target="_blank" rel="noopener noreferrer"
-                        style={{
+                    {p.live
+                      ? (
+                        <a href={p.live} target="_blank" rel="noopener noreferrer"
+                          style={{
+                            display: "flex", alignItems: "center", gap: 5,
+                            padding: "6px 14px", borderRadius: 4,
+                            background: `${p.color}12`, border: `1px solid ${p.color}30`,
+                            fontFamily: "'Fira Code', monospace", fontSize: 11, color: p.color,
+                            textDecoration: "none", transition: "all 0.2s",
+                          }}>
+                          <ExternalLink size={11} /> Live Demo
+                        </a>
+                      ) : (
+                        <span style={{
                           display: "flex", alignItems: "center", gap: 5,
                           padding: "6px 14px", borderRadius: 4,
-                          background: `${p.color}12`, border: `1px solid ${p.color}30`,
-                          fontFamily: "'Fira Code', monospace", fontSize: 11, color: p.color,
-                          textDecoration: "none", transition: "all 0.2s",
+                          background: "#1E1E1E", border: "1px solid #2D2D30",
+                          fontFamily: "'Fira Code', monospace", fontSize: 11, color: "#3E3E42",
                         }}>
-                        <ExternalLink size={11} /> live_demo
-                      </a>
-                    )}
+                          <ExternalLink size={11} /> Private
+                        </span>
+                      )
+                    }
                   </div>
                 </div>
               </div>
